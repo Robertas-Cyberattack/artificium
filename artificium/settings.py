@@ -132,3 +132,6 @@ STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
 
 # This is only used for local development links in Stripe redirects.
 DOMAIN = os.environ.get('DOMAIN', 'http://127.0.0.1:8000')
+
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'hi@artificium.ltd')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'hi@artificium.ltd')

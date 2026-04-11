@@ -2,6 +2,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.mail import send_mail
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
 
@@ -30,7 +31,44 @@ def request_quote(request):
 
 
 def contact(request):
-    return render(request, 'home/contact.html')
+    submitted = False
+
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name', '').strip()
+        company_name = request.POST.get('company_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone_number = request.POST.get('phone_number', '').strip()
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+
+        if not full_name or not email or not subject or not message:
+            messages.error(request, 'Please complete all required fields.')
+            return redirect('contact')
+
+        email_subject = f'Artificium Contact Form: {subject}'
+        email_message = (
+            f'Full Name: {full_name}\n'
+            f'Company Name: {company_name}\n'
+            f'Email: {email}\n'
+            f'Phone Number: {phone_number}\n\n'
+            f'Message:\n{message}'
+        )
+
+        send_mail(
+            subject=email_subject,
+            message=email_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.CONTACT_EMAIL],
+            fail_silently=False,
+        )
+
+        submitted = True
+
+    return render(
+        request,
+        'home/contact.html',
+        {'submitted': submitted},
+    )
 
 
 def pay_quote(request):
