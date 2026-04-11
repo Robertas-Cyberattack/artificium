@@ -1,0 +1,135 @@
+from decimal import Decimal, InvalidOperation
+
+from django.conf import settings
+from django.contrib import messages
+from django.http import HttpResponseBadRequest
+from django.shortcuts import redirect, render
+
+import stripe
+
+
+def index(request):
+    return render(request, 'home/index.html')
+
+
+def services(request):
+    return render(request, 'home/services.html')
+
+
+def request_quote(request):
+    submitted = False
+
+    if request.method == 'POST':
+        submitted = True
+
+    return render(
+        request,
+        'home/request_quote.html',
+        {'submitted': submitted},
+    )
+
+
+def contact(request):
+    return render(request, 'home/contact.html')
+
+
+def pay_quote(request):
+    return render(
+        request,
+        'home/pay_quote.html',
+        {
+            'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+        },
+    )
+
+
+def create_checkout_session(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Invalid request method.')
+
+    quote_reference = request.POST.get('quote_reference', '').strip().upper()
+    client_name = request.POST.get('client_name', '').strip()
+    client_email = request.POST.get('client_email', '').strip()
+    service_name = request.POST.get('service_name', '').strip()
+    quote_amount = request.POST.get('quote_amount', '').strip()
+
+    if not quote_reference or not client_email or not service_name or not quote_amount:
+        messages.error(request, 'Please complete all required payment fields.')
+        return redirect('pay_quote')
+
+    try:
+        amount_decimal = Decimal(quote_amount)
+    except InvalidOperation:
+        messages.error(request, 'Enter a valid quote amount.')
+        return redirect('pay_quote')
+
+    if amount_decimal <= 0:
+        messages.error(request, 'Quote amount must be greater than zero.')
+        return redirect('pay_quote')
+
+    amount_in_pence = int(amount_decimal * 100)
+
+    if not settings.STRIPE_SECRET_KEY:
+        messages.error(request, 'Stripe is not configured yet. Add your Stripe keys first.')
+        return redirect('pay_quote')
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            mode='payment',
+            success_url=f"{settings.DOMAIN}/payment-success/?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{settings.DOMAIN}/payment-cancel/",
+            client_reference_id=quote_reference,
+            customer_email=client_email,
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'gbp',
+                        'product_data': {
+                            'name': f'{service_name} Quote Payment',
+                            'description': f'Quote reference: {quote_reference}',
+                        },
+                        'unit_amount': amount_in_pence,
+                    },
+                    'quantity': 1,
+                }
+            ],
+            metadata={
+                'quote_reference': quote_reference,
+                'client_name': client_name,
+                'client_email': client_email,
+                'service_name': service_name,
+                'quote_amount': str(amount_decimal),
+            },
+        )
+        return redirect(checkout_session.url, code=303)
+
+    except Exception as error:
+        messages.error(request, f'Unable to start payment session: {error}')
+        return redirect('pay_quote')
+
+
+def payment_success(request):
+    session_id = request.GET.get('session_id')
+    session = None
+
+    if session_id and settings.STRIPE_SECRET_KEY:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+        except Exception:
+            session = None
+
+    return render(
+        request,
+        'home/payment_success.html',
+        {
+            'session': session,
+        },
+    )
+
+
+def payment_cancel(request):
+    return render(request, 'home/payment_cancel.html')

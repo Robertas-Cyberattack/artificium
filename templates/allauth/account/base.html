@@ -1,0 +1,115 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% block meta %}
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% endblock %}
+
+    {% block corecss %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
+
+    <title>Artificium{% block extra_title %}{% endblock %}</title>
+</head>
+
+<body>
+
+<header class="container-fluid border-bottom bg-white">
+    <div class="container py-3">
+        <div class="row align-items-center">
+
+            <div class="col-12 col-lg-3">
+                <a href="{% url 'home' %}" class="text-dark text-decoration-none">
+                    <h2 class="mb-0">Artificium</h2>
+                    <small class="text-muted">Construction Support Services</small>
+                </a>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <nav class="navbar navbar-expand-lg navbar-light p-0">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="mainNav">
+                        <ul class="navbar-nav mx-auto">
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'home' %}">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'services' %}">Services</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'request_quote' %}">Request Quote</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'pay_quote' %}">Pay Quote</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="col-12 col-lg-3 text-lg-right">
+
+                {% if request.user.is_authenticated %}
+                <div class="dropdown">
+                    <a class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown">
+                        My Account
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#">My Quotes</a>
+                        <a class="dropdown-item" href="#">My Payments</a>
+                        <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'account_login' %}" class="btn btn-outline-dark mr-2">
+                    Login
+                </a>
+
+                <a href="{% url 'account_signup' %}" class="btn btn-dark">
+                    Register
+                </a>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</header>
+
+{% if messages %}
+<section class="container py-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} mb-0" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% block content %}
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

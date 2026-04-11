@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_title %} | Request Quote{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+        <div class="text-center mb-5">
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">Request a Quote</p>
+            <h1 class="font-weight-bold">Tell us about your project</h1>
+            <p class="lead text-muted mb-0">
+                Submit your requirements and receive a quotation for planning, drafting,
+                structural calculations, or estimating support.
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-lg-8 mb-4">
+                <div class="bg-white border shadow-sm p-4 p-lg-5 h-100">
+                    {% if submitted %}
+                        <div class="alert alert-success" role="alert">
+                            Your quote request has been submitted successfully. We will review your details and contact you shortly.
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'request_quote' %}">
+                        {% csrf_token %}
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="full_name">Full Name</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="full_name"
+                                    name="full_name"
+                                    placeholder="Enter your full name"
+                                    required>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="company_name">Company Name</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="company_name"
+                                    name="company_name"
+                                    placeholder="Enter company name">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="email">Email Address</label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    placeholder="Enter your email"
+                                    required>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="phone_number">Phone Number</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="phone_number"
+                                    name="phone_number"
+                                    placeholder="Enter your phone number">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="service_type">Service Required</label>
+                            <select class="form-control" id="service_type" name="service_type" required>
+                                <option value="">Select a service</option>
+                                <option value="primavera_p6_planning">Oracle Primavera P6 Planning</option>
+                                <option value="autocad_drafting">AutoCAD Drafting</option>
+                                <option value="tekla_tedds_calculations">Tekla Tedds Structural Calculations</option>
+                                <option value="construction_estimating">Construction Estimating</option>
+                                <option value="multiple_services">Multiple Services</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project_title">Project Title</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="project_title"
+                                name="project_title"
+                                placeholder="Enter project title"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project_details">Project Details</label>
+                            <textarea
+                                class="form-control"
+                                id="project_details"
+                                name="project_details"
+                                rows="6"
+                                placeholder="Describe the scope of work, deliverables, deadlines, and any relevant technical information"
+                                required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="required_by">Required By</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="required_by"
+                                    name="required_by">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="budget_range">Budget Range</label>
+                                <select class="form-control" id="budget_range" name="budget_range">
+                                    <option value="">Select budget range</option>
+                                    <option value="under_250">Under £250</option>
+                                    <option value="250_500">£250 - £500</option>
+                                    <option value="500_1000">£500 - £1,000</option>
+                                    <option value="1000_2500">£1,000 - £2,500</option>
+                                    <option value="2500_plus">£2,500+</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reference_info">Reference Information</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="reference_info"
+                                name="reference_info"
+                                placeholder="Optional project reference, drawing number, or tender reference">
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="additional_notes">Additional Notes</label>
+                            <textarea
+                                class="form-control"
+                                id="additional_notes"
+                                name="additional_notes"
+                                rows="4"
+                                placeholder="Any additional information you would like to include"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-lg mr-2 mb-2">
+                            Submit Quote Request
+                        </button>
+
+                        <a href="{% url 'contact' %}" class="btn btn-outline-dark btn-lg mb-2">
+                            Contact Instead
+                        </a>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4 mb-4">
+                <div class="bg-white border shadow-sm p-4 mb-4">
+                    <h2 class="h4 mb-3">What to include</h2>
+                    <p class="text-muted">
+                        To receive a more accurate quote, please include as much project information as possible.
+                    </p>
+                    <ul class="text-muted mb-0 pl-3">
+                        <li>Type of service required</li>
+                        <li>Project scope and expected output</li>
+                        <li>Required dates or deadlines</li>
+                        <li>Drawing, programme, or calculation references</li>
+                        <li>Any relevant constraints or client requirements</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white border shadow-sm p-4">
+                    <h2 class="h4 mb-3">How it works</h2>
+                    <p class="text-muted mb-2"><strong>1.</strong> Submit your request</p>
+                    <p class="text-muted mb-2"><strong>2.</strong> Receive a quotation and reference number</p>
+                    <p class="text-muted mb-2"><strong>3.</strong> Approve and pay online</p>
+                    <p class="text-muted mb-0"><strong>4.</strong> Receive completed deliverables by email</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
