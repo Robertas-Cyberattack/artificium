@@ -98,6 +98,16 @@
     </div>
 </header>
 
+{% if messages %}
+<section class="container py-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
 {% block content %}
 {% endblock %}
 

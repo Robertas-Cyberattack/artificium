@@ -10,4 +10,5 @@ urlpatterns = [
     path('payment-success/', views.payment_success, name='payment_success'),
     path('payment-cancel/', views.payment_cancel, name='payment_cancel'),
     path('contact/', views.contact, name='contact'),
+    path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
 ]
