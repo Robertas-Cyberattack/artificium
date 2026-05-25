@@ -171,3 +171,10 @@ def payment_success(request):
 
 def payment_cancel(request):
     return render(request, 'home/payment_cancel.html')
+
+def terms(request):
+    return render(request, 'legal/terms.html')
+
+
+def privacy(request):
+    return render(request, 'legal/privacy.html')
