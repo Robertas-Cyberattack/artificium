@@ -248,3 +248,18 @@ def my_quotes(request):
 @login_required
 def my_payments(request):
     return render(request, 'home/my_payments.html')
+
+@login_required
+def admin_projects(request):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    projects = ClientProject.objects.all().order_by('-created_at')
+
+    return render(
+        request,
+        'home/admin_projects.html',
+        {
+            'projects': projects,
+        }
+    )

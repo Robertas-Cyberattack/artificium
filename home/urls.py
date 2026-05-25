@@ -20,4 +20,6 @@ urlpatterns = [
 
     path('dashboard/quotes/', views.my_quotes, name='my_quotes'),
     path('dashboard/payments/', views.my_payments, name='my_payments'),
+
+    path('dashboard/admin/projects/', views.admin_projects, name='admin_projects'),
 ]
