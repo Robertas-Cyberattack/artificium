@@ -239,3 +239,12 @@ def admin_dashboard(request):
             'files': files,
         }
     )
+
+@login_required
+def my_quotes(request):
+    return render(request, 'home/my_quotes.html')
+
+
+@login_required
+def my_payments(request):
+    return render(request, 'home/my_payments.html')
