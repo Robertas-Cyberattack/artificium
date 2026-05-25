@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+
+        <div class="mb-5">
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">
+                Client Area
+            </p>
+
+            <h1 class="font-weight-bold">
+                My Dashboard
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Manage your projects, files and communication.
+            </p>
+        </div>
+
+        <div class="bg-white border shadow-sm p-4">
+
+            <h2 class="h4 mb-4">
+                My Projects
+            </h2>
+
+            {% if projects %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for project in projects %}
+
+                                <tr>
+                                    <td>{{ project.title }}</td>
+
+                                    <td>
+                                        {{ project.get_status_display }}
+                                    </td>
+
+                                    <td>
+                                        {{ project.created_at|date:"d M Y" }}
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">
+                    No projects assigned yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
