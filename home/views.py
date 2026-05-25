@@ -6,6 +6,15 @@ from django.core.mail import send_mail
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
+from .models import (
+    ClientProject,
+    ProjectFile,
+    ProjectMessage,
+)
+
 import stripe
 
 
@@ -178,3 +187,55 @@ def terms(request):
 
 def privacy(request):
     return render(request, 'legal/privacy.html')
+
+@login_required
+def dashboard(request):
+
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    projects = ClientProject.objects.filter(
+        client=request.user
+    ).order_by('-created_at')
+
+    return render(
+        request,
+        'home/dashboard.html',
+        {
+            'projects': projects,
+        }
+    )
+
+
+@login_required
+def admin_dashboard(request):
+
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    clients = User.objects.filter(
+        is_staff=False
+    )
+
+    projects = ClientProject.objects.all().order_by(
+        '-created_at'
+    )
+
+    messages = ProjectMessage.objects.all().order_by(
+        '-created_at'
+    )[:10]
+
+    files = ProjectFile.objects.all().order_by(
+        '-uploaded_at'
+    )[:10]
+
+    return render(
+        request,
+        'home/admin_dashboard.html',
+        {
+            'clients': clients,
+            'projects': projects,
+            'messages': messages,
+            'files': files,
+        }
+    )
