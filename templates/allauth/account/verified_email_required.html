@@ -1,23 +1,70 @@
-{% extends "account/base.html" %}
+{% extends "base.html" %}
 
 {% load i18n %}
 
-{% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
+{% block extra_title %} | Verify Email{% endblock %}
 
 {% block content %}
-<h1>{% trans "Verify Your E-mail Address" %}</h1>
 
-{% url 'account_email' as email_url %}
+<section class="py-5 bg-light">
+    <div class="container py-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-6">
 
-<p>{% blocktrans %}This part of the site requires us to verify that
-you are who you claim to be. For this purpose, we require that you
-verify ownership of your e-mail address. {% endblocktrans %}</p>
+                <div class="bg-white shadow-sm border rounded p-4 p-lg-5">
 
-<p>{% blocktrans %}We have sent an e-mail to you for
-verification. Please click on the link inside that e-mail. If you do not see the verification e-mail in your main inbox, check your spam folder. Otherwise
-contact us if you do not receive it within a few minutes.{% endblocktrans %}</p>
+                    <div class="text-center mb-4">
 
-<p>{% blocktrans %}<strong>Note:</strong> you can still <a href="{{ email_url }}">change your e-mail address</a>.{% endblocktrans %}</p>
+                        <p class="text-uppercase text-muted font-weight-bold mb-2">
+                            Account Verification
+                        </p>
 
+                        <h1 class="mb-3">
+                            {% trans "Verify Your E-mail Address" %}
+                        </h1>
+
+                        <p class="text-muted mb-4">
+                            {% blocktrans %}
+                            This part of the site requires verification of your e-mail address
+                            to confirm your account ownership and activate account features.
+                            {% endblocktrans %}
+                        </p>
+
+                    </div>
+
+                    {% url 'account_email' as email_url %}
+
+                    <div class="mb-4">
+                        <p class="text-muted">
+                            {% blocktrans %}
+                            We have sent a verification e-mail to your inbox.
+                            Please click the verification link inside the email.
+                            If you cannot find the email, please check your spam folder.
+                            {% endblocktrans %}
+                        </p>
+                    </div>
+
+                    <div class="bg-light border rounded p-3 mb-4">
+                        <p class="mb-0 small text-muted">
+                            {% blocktrans %}
+                            <strong>Note:</strong> You can still
+                            <a href="{{ email_url }}">change your e-mail address</a>.
+                            {% endblocktrans %}
+                        </p>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="{% url 'account_login' %}"
+                           class="btn btn-dark px-4">
+                            Back to Login
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
 
 {% endblock %}
