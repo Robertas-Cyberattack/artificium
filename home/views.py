@@ -263,3 +263,104 @@ def admin_projects(request):
             'projects': projects,
         }
     )
+
+@login_required
+def admin_create_project(request):
+
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    clients = User.objects.filter(
+        is_staff=False
+    )
+
+    if request.method == 'POST':
+
+        client_id = request.POST.get('client')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        status = request.POST.get('status')
+        progress = request.POST.get('progress') or 0
+
+        client = User.objects.get(
+            id=client_id
+        )
+
+        ClientProject.objects.create(
+            client=client,
+            title=title,
+            description=description,
+            status=status,
+            progress=progress,
+        )
+
+        messages.success(
+            request,
+            'Project created successfully.'
+        )
+
+        return redirect('admin_projects')
+
+    return render(
+        request,
+        'home/admin_create_project.html',
+        {
+            'clients': clients,
+            'status_choices': ClientProject.STATUS_CHOICES,
+        }
+    )
+
+@login_required
+def admin_project_detail(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = ClientProject.objects.get(id=project_id)
+
+    return render(request, 'home/admin_project_detail.html', {
+        'project': project,
+    })
+
+
+@login_required
+def admin_edit_project(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = ClientProject.objects.get(id=project_id)
+    clients = User.objects.filter(is_staff=False)
+
+    if request.method == 'POST':
+        project.client = User.objects.get(id=request.POST.get('client'))
+        project.title = request.POST.get('title')
+        project.description = request.POST.get('description')
+        project.status = request.POST.get('status')
+        project.progress = request.POST.get('progress') or 0
+        project.admin_notes = request.POST.get('admin_notes')
+        project.save()
+
+        messages.success(request, 'Project updated successfully.')
+        return redirect('admin_project_detail', project_id=project.id)
+
+    return render(request, 'home/admin_edit_project.html', {
+        'project': project,
+        'clients': clients,
+        'status_choices': ClientProject.STATUS_CHOICES,
+    })
+
+
+@login_required
+def admin_delete_project(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = ClientProject.objects.get(id=project_id)
+
+    if request.method == 'POST':
+        project.delete()
+        messages.success(request, 'Project deleted successfully.')
+        return redirect('admin_projects')
+
+    return render(request, 'home/admin_delete_project.html', {
+        'project': project,
+    })

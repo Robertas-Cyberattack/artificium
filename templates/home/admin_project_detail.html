@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | Project Detail{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+
+        <div class="mb-4">
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">Admin Area</p>
+            <h1 class="font-weight-bold">{{ project.title }}</h1>
+            <p class="lead text-muted mb-0">Client: {{ project.client.username }}</p>
+        </div>
+
+        <div class="bg-white border shadow-sm p-4 mb-4">
+            <p><strong>Status:</strong> {{ project.get_status_display }}</p>
+            <p><strong>Progress:</strong> {{ project.progress }}%</p>
+            <p><strong>Description:</strong></p>
+            <p class="text-muted">{{ project.description }}</p>
+
+            <p><strong>Admin Notes:</strong></p>
+            <p class="text-muted">{{ project.admin_notes }}</p>
+
+            <a href="{% url 'admin_edit_project' project.id %}" class="btn btn-dark">
+                Edit Project
+            </a>
+
+            <a href="{% url 'admin_delete_project' project.id %}" class="btn btn-outline-danger">
+                Delete Project
+            </a>
+
+            <a href="{% url 'admin_projects' %}" class="btn btn-outline-secondary">
+                Back
+            </a>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

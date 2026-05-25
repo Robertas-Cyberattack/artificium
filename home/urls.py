@@ -22,4 +22,10 @@ urlpatterns = [
     path('dashboard/payments/', views.my_payments, name='my_payments'),
 
     path('dashboard/admin/projects/', views.admin_projects, name='admin_projects'),
+
+    path('dashboard/admin/projects/create/', views.admin_create_project, name='admin_create_project'),
+
+    path('dashboard/admin/projects/<int:project_id>/', views.admin_project_detail, name='admin_project_detail'),
+    path('dashboard/admin/projects/<int:project_id>/edit/', views.admin_edit_project, name='admin_edit_project'),
+    path('dashboard/admin/projects/<int:project_id>/delete/', views.admin_delete_project, name='admin_delete_project'),
 ]
