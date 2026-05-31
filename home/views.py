@@ -350,17 +350,53 @@ def admin_edit_project(request, project_id):
 
 
 @login_required
-def admin_delete_project(request, project_id):
+def admin_create_project(request):
+
     if not request.user.is_staff:
         return redirect('dashboard')
 
-    project = ClientProject.objects.get(id=project_id)
+    clients = User.objects.filter(is_staff=False)
 
     if request.method == 'POST':
-        project.delete()
-        messages.success(request, 'Project deleted successfully.')
+
+        existing_client_id = request.POST.get('existing_client')
+        new_client_username = request.POST.get('new_client_username', '').strip()
+        new_client_email = request.POST.get('new_client_email', '').strip()
+
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        status = request.POST.get('status')
+        progress = request.POST.get('progress') or 0
+
+        if existing_client_id:
+            client = User.objects.get(id=existing_client_id)
+        else:
+            if not new_client_username or not new_client_email:
+                messages.error(request, 'Select existing client or create a new client.')
+                return redirect('admin_create_project')
+
+            client = User.objects.create_user(
+                username=new_client_username,
+                email=new_client_email,
+                password='TemporaryPassword123!'
+            )
+
+        ClientProject.objects.create(
+            client=client,
+            title=title,
+            description=description,
+            status=status,
+            progress=progress,
+        )
+
+        messages.success(request, 'Project created successfully.')
         return redirect('admin_projects')
 
-    return render(request, 'home/admin_delete_project.html', {
-        'project': project,
-    })
+    return render(
+        request,
+        'home/admin_create_project.html',
+        {
+            'clients': clients,
+            'status_choices': ClientProject.STATUS_CHOICES,
+        }
+    )

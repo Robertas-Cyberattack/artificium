@@ -5,11 +5,9 @@
 {% block content %}
 
 <section class="py-5 bg-light">
-
     <div class="container py-lg-4">
 
         <div class="mb-5">
-
             <p class="text-uppercase font-weight-bold text-secondary mb-2">
                 Admin Area
             </p>
@@ -19,41 +17,70 @@
             </h1>
 
             <p class="lead text-muted mb-0">
-                Create and assign projects to clients.
+                Create a project for an existing client or create a new client.
             </p>
-
         </div>
 
         <div class="bg-white border shadow-sm p-4">
 
             <form method="post">
-
                 {% csrf_token %}
 
-                <div class="form-group mb-3">
+                <h2 class="h5 mb-3">Client</h2>
+
+                <div class="form-group mb-4">
                     <label class="font-weight-bold">
-                        Client
+                        Existing Client
                     </label>
 
-                    <select name="client" class="form-control" required>
-
+                    <select name="existing_client" class="form-control">
                         <option value="">
-                            Select Client
+                            Select existing client or create new below
                         </option>
 
                         {% for client in clients %}
-
                             <option value="{{ client.id }}">
                                 {{ client.username }} - {{ client.email }}
                             </option>
-
                         {% endfor %}
-
                     </select>
                 </div>
 
-                <div class="form-group mb-3">
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <h3 class="h6 mb-3">
+                        New Client
+                    </h3>
 
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">
+                            New Client Username
+                        </label>
+
+                        <input
+                            type="text"
+                            name="new_client_username"
+                            class="form-control"
+                            placeholder="example_client"
+                        >
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold">
+                            New Client Email
+                        </label>
+
+                        <input
+                            type="email"
+                            name="new_client_email"
+                            class="form-control"
+                            placeholder="client@example.com"
+                        >
+                    </div>
+                </div>
+
+                <h2 class="h5 mb-3">Project Details</h2>
+
+                <div class="form-group mb-3">
                     <label class="font-weight-bold">
                         Project Title
                     </label>
@@ -64,11 +91,9 @@
                         class="form-control"
                         required
                     >
-
                 </div>
 
                 <div class="form-group mb-3">
-
                     <label class="font-weight-bold">
                         Description
                     </label>
@@ -78,31 +103,23 @@
                         class="form-control"
                         rows="5"
                     ></textarea>
-
                 </div>
 
                 <div class="form-group mb-3">
-
                     <label class="font-weight-bold">
                         Status
                     </label>
 
                     <select name="status" class="form-control">
-
                         {% for value, label in status_choices %}
-
                             <option value="{{ value }}">
                                 {{ label }}
                             </option>
-
                         {% endfor %}
-
                     </select>
-
                 </div>
 
                 <div class="form-group mb-4">
-
                     <label class="font-weight-bold">
                         Progress %
                     </label>
@@ -115,17 +132,13 @@
                         max="100"
                         value="0"
                     >
-
                 </div>
 
                 <button type="submit" class="btn btn-dark">
                     Create Project
                 </button>
 
-                <a
-                    href="{% url 'admin_projects' %}"
-                    class="btn btn-outline-secondary"
-                >
+                <a href="{% url 'admin_projects' %}" class="btn btn-outline-secondary">
                     Cancel
                 </a>
 
@@ -134,7 +147,6 @@
         </div>
 
     </div>
-
 </section>
 
 {% endblock %}
