@@ -143,14 +143,88 @@ def create_checkout_session(request):
         return redirect('pay_quote')
 
 
+@login_required
+def create_project_payment(request, project_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    project = get_object_or_404(
+        ClientProject,
+        id=project_id,
+        client=request.user,
+    )
+
+    if project.price <= 0:
+        messages.error(request, 'This project does not have a payment amount yet.')
+        return redirect('dashboard')
+
+    if project.is_paid:
+        messages.info(request, 'This project has already been paid.')
+        return redirect('dashboard')
+
+    if not settings.STRIPE_SECRET_KEY:
+        messages.error(request, 'Stripe is not configured yet.')
+        return redirect('dashboard')
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    amount_in_pence = int(project.price * 100)
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            mode='payment',
+            success_url=f"{settings.DOMAIN}/payment-success/?session_id={{CHECKOUT_SESSION_ID}}&project_id={project.id}",
+            cancel_url=f"{settings.DOMAIN}/dashboard/",
+            client_reference_id=f'PROJECT-{project.id}',
+            customer_email=request.user.email,
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'gbp',
+                        'product_data': {
+                            'name': project.title,
+                            'description': f'Project invoice: {project.invoice_number}',
+                        },
+                        'unit_amount': amount_in_pence,
+                    },
+                    'quantity': 1,
+                }
+            ],
+            metadata={
+                'project_id': project.id,
+                'client_username': request.user.username,
+                'invoice_number': project.invoice_number,
+                'project_title': project.title,
+            },
+        )
+
+        return redirect(checkout_session.url, code=303)
+
+    except Exception as error:
+        messages.error(request, f'Unable to start payment session: {error}')
+        return redirect('dashboard')
+
+
 def payment_success(request):
     session_id = request.GET.get('session_id')
+    project_id = request.GET.get('project_id')
     session = None
 
     if session_id and settings.STRIPE_SECRET_KEY:
         stripe.api_key = settings.STRIPE_SECRET_KEY
+
         try:
             session = stripe.checkout.Session.retrieve(session_id)
+
+            if project_id:
+                project = ClientProject.objects.filter(id=project_id).first()
+
+                if project:
+                    project.is_paid = True
+                    project.status = 'paid'
+                    project.save()
+
         except Exception:
             session = None
 
@@ -182,6 +256,37 @@ def dashboard(request):
 
 
 @login_required
+def client_create_project(request):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        client_notes = request.POST.get('client_notes', '').strip()
+
+        if not title:
+            messages.error(request, 'Please enter project title.')
+            return redirect('client_create_project')
+
+        ClientProject.objects.create(
+            client=request.user,
+            title=title,
+            description=description,
+            client_notes=client_notes,
+            status='requested',
+            price=0,
+            is_paid=False,
+            progress=0,
+        )
+
+        messages.success(request, 'Project request submitted successfully.')
+        return redirect('dashboard')
+
+    return render(request, 'home/client_create_project.html')
+
+
+@login_required
 def admin_dashboard(request):
     if not request.user.is_staff:
         return redirect('dashboard')
@@ -205,12 +310,26 @@ def admin_dashboard(request):
 
 @login_required
 def my_quotes(request):
-    return render(request, 'home/my_quotes.html')
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    projects = ClientProject.objects.filter(
+        client=request.user
+    ).order_by('-created_at')
+
+    return render(request, 'home/my_quotes.html', {'projects': projects})
 
 
 @login_required
 def my_payments(request):
-    return render(request, 'home/my_payments.html')
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    projects = ClientProject.objects.filter(
+        client=request.user
+    ).order_by('-created_at')
+
+    return render(request, 'home/my_payments.html', {'projects': projects})
 
 
 @login_required
@@ -237,7 +356,9 @@ def admin_create_project(request):
 
         title = request.POST.get('title', '').strip()
         description = request.POST.get('description', '').strip()
-        status = request.POST.get('status', 'new')
+        price = request.POST.get('price') or 0
+        invoice_number = request.POST.get('invoice_number', '').strip()
+        status = request.POST.get('status', 'requested')
         progress = request.POST.get('progress') or 0
 
         if existing_client_id:
@@ -257,6 +378,8 @@ def admin_create_project(request):
             client=client,
             title=title,
             description=description,
+            price=price,
+            invoice_number=invoice_number,
             status=status,
             progress=progress,
         )
@@ -296,7 +419,10 @@ def admin_edit_project(request, project_id):
         project.client = get_object_or_404(User, id=request.POST.get('client'))
         project.title = request.POST.get('title', '').strip()
         project.description = request.POST.get('description', '').strip()
-        project.status = request.POST.get('status', 'new')
+        project.price = request.POST.get('price') or 0
+        project.invoice_number = request.POST.get('invoice_number', '').strip()
+        project.is_paid = request.POST.get('is_paid') == 'on'
+        project.status = request.POST.get('status', 'requested')
         project.progress = request.POST.get('progress') or 0
         project.admin_notes = request.POST.get('admin_notes', '').strip()
         project.save()
@@ -329,6 +455,7 @@ def admin_delete_project(request, project_id):
 
     return render(request, 'home/admin_delete_project.html', {'project': project})
 
+
 @login_required
 def admin_clients(request):
     if not request.user.is_staff:
@@ -336,9 +463,7 @@ def admin_clients(request):
 
     clients = User.objects.filter(is_staff=False).order_by('-date_joined')
 
-    return render(request, 'home/admin_clients.html', {
-        'clients': clients,
-    })
+    return render(request, 'home/admin_clients.html', {'clients': clients})
 
 
 @login_required
@@ -409,6 +534,58 @@ def admin_delete_client(request, client_id):
         messages.success(request, 'Client deleted successfully.')
         return redirect('admin_clients')
 
-    return render(request, 'home/admin_delete_client.html', {
-        'client': client,
+    return render(request, 'home/admin_delete_client.html', {'client': client})
+
+@login_required
+def client_edit_project(request, project_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    project = get_object_or_404(
+        ClientProject,
+        id=project_id,
+        client=request.user,
+    )
+
+    if project.is_paid or project.status not in ['requested']:
+        messages.error(request, 'You can only edit projects before they are quoted or paid.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        project.title = request.POST.get('title', '').strip()
+        project.description = request.POST.get('description', '').strip()
+        project.client_notes = request.POST.get('client_notes', '').strip()
+        project.save()
+
+        messages.success(request, 'Project updated successfully.')
+        return redirect('dashboard')
+
+    return render(request, 'home/client_edit_project.html', {
+        'project': project,
     })
+
+
+@login_required
+def client_delete_project(request, project_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    project = get_object_or_404(
+        ClientProject,
+        id=project_id,
+        client=request.user,
+    )
+
+    if project.is_paid or project.status not in ['requested']:
+        messages.error(request, 'You can only delete projects before they are quoted or paid.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        project.delete()
+        messages.success(request, 'Project deleted successfully.')
+        return redirect('dashboard')
+
+    return render(request, 'home/client_delete_project.html', {
+        'project': project,
+    })
+

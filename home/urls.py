@@ -31,5 +31,11 @@ urlpatterns = [
     path('dashboard/admin/clients/<int:client_id>/edit/', views.admin_edit_client, name='admin_edit_client'),
     path('dashboard/admin/clients/<int:client_id>/delete/', views.admin_delete_client, name='admin_delete_client'),
     path('dashboard/admin/clients/', views.admin_clients, name='admin_clients'),
+    path('dashboard/projects/create/', views.client_create_project, name='client_create_project'),
+    path('dashboard/projects/<int:project_id>/pay/', views.create_project_payment, name='create_project_payment'),
+    path('dashboard/projects/<int:project_id>/edit/', views.client_edit_project, name='client_edit_project'),
+    path('dashboard/projects/<int:project_id>/delete/', views.client_delete_project, name='client_delete_project'),
+
+
 ]
 
