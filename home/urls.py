@@ -6,7 +6,6 @@ urlpatterns = [
     path('services/', views.services, name='services'),
     path('request-quote/', views.request_quote, name='request_quote'),
     path('pay-quote/', views.pay_quote, name='pay_quote'),
-    path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
     path('payment-success/', views.payment_success, name='payment_success'),
     path('payment-cancel/', views.payment_cancel, name='payment_cancel'),
     path('contact/', views.contact, name='contact'),
@@ -28,4 +27,9 @@ urlpatterns = [
     path('dashboard/admin/projects/<int:project_id>/', views.admin_project_detail, name='admin_project_detail'),
     path('dashboard/admin/projects/<int:project_id>/edit/', views.admin_edit_project, name='admin_edit_project'),
     path('dashboard/admin/projects/<int:project_id>/delete/', views.admin_delete_project, name='admin_delete_project'),
+    path('dashboard/admin/clients/create/', views.admin_create_client, name='admin_create_client'),
+    path('dashboard/admin/clients/<int:client_id>/edit/', views.admin_edit_client, name='admin_edit_client'),
+    path('dashboard/admin/clients/<int:client_id>/delete/', views.admin_delete_client, name='admin_delete_client'),
+    path('dashboard/admin/clients/', views.admin_clients, name='admin_clients'),
 ]
+

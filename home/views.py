@@ -1,21 +1,16 @@
 from decimal import Decimal, InvalidOperation
 
+import stripe
+
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.http import HttpResponseBadRequest
-from django.shortcuts import redirect, render
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.http import HttpResponseBadRequest
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import (
-    ClientProject,
-    ProjectFile,
-    ProjectMessage,
-)
-
-import stripe
+from .models import ClientProject, ProjectFile, ProjectMessage
 
 
 def index(request):
@@ -32,11 +27,7 @@ def request_quote(request):
     if request.method == 'POST':
         submitted = True
 
-    return render(
-        request,
-        'home/request_quote.html',
-        {'submitted': submitted},
-    )
+    return render(request, 'home/request_quote.html', {'submitted': submitted})
 
 
 def contact(request):
@@ -73,20 +64,14 @@ def contact(request):
 
         submitted = True
 
-    return render(
-        request,
-        'home/contact.html',
-        {'submitted': submitted},
-    )
+    return render(request, 'home/contact.html', {'submitted': submitted})
 
 
 def pay_quote(request):
     return render(
         request,
         'home/pay_quote.html',
-        {
-            'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
-        },
+        {'stripe_public_key': settings.STRIPE_PUBLIC_KEY},
     )
 
 
@@ -169,17 +154,12 @@ def payment_success(request):
         except Exception:
             session = None
 
-    return render(
-        request,
-        'home/payment_success.html',
-        {
-            'session': session,
-        },
-    )
+    return render(request, 'home/payment_success.html', {'session': session})
 
 
 def payment_cancel(request):
     return render(request, 'home/payment_cancel.html')
+
 
 def terms(request):
     return render(request, 'legal/terms.html')
@@ -188,9 +168,9 @@ def terms(request):
 def privacy(request):
     return render(request, 'legal/privacy.html')
 
+
 @login_required
 def dashboard(request):
-
     if request.user.is_staff:
         return redirect('admin_dashboard')
 
@@ -198,36 +178,18 @@ def dashboard(request):
         client=request.user
     ).order_by('-created_at')
 
-    return render(
-        request,
-        'home/dashboard.html',
-        {
-            'projects': projects,
-        }
-    )
+    return render(request, 'home/dashboard.html', {'projects': projects})
 
 
 @login_required
 def admin_dashboard(request):
-
     if not request.user.is_staff:
         return redirect('dashboard')
 
-    clients = User.objects.filter(
-        is_staff=False
-    )
-
-    projects = ClientProject.objects.all().order_by(
-        '-created_at'
-    )
-
-    messages = ProjectMessage.objects.all().order_by(
-        '-created_at'
-    )[:10]
-
-    files = ProjectFile.objects.all().order_by(
-        '-uploaded_at'
-    )[:10]
+    clients = User.objects.filter(is_staff=False)
+    projects = ClientProject.objects.all().order_by('-created_at')
+    recent_messages = ProjectMessage.objects.all().order_by('-created_at')[:10]
+    files = ProjectFile.objects.all().order_by('-uploaded_at')[:10]
 
     return render(
         request,
@@ -235,10 +197,11 @@ def admin_dashboard(request):
         {
             'clients': clients,
             'projects': projects,
-            'messages': messages,
+            'messages': recent_messages,
             'files': files,
-        }
+        },
     )
+
 
 @login_required
 def my_quotes(request):
@@ -249,6 +212,7 @@ def my_quotes(request):
 def my_payments(request):
     return render(request, 'home/my_payments.html')
 
+
 @login_required
 def admin_projects(request):
     if not request.user.is_staff:
@@ -256,120 +220,28 @@ def admin_projects(request):
 
     projects = ClientProject.objects.all().order_by('-created_at')
 
-    return render(
-        request,
-        'home/admin_projects.html',
-        {
-            'projects': projects,
-        }
-    )
-
-@login_required
-def admin_create_project(request):
-
-    if not request.user.is_staff:
-        return redirect('dashboard')
-
-    clients = User.objects.filter(
-        is_staff=False
-    )
-
-    if request.method == 'POST':
-
-        client_id = request.POST.get('client')
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        status = request.POST.get('status')
-        progress = request.POST.get('progress') or 0
-
-        client = User.objects.get(
-            id=client_id
-        )
-
-        ClientProject.objects.create(
-            client=client,
-            title=title,
-            description=description,
-            status=status,
-            progress=progress,
-        )
-
-        messages.success(
-            request,
-            'Project created successfully.'
-        )
-
-        return redirect('admin_projects')
-
-    return render(
-        request,
-        'home/admin_create_project.html',
-        {
-            'clients': clients,
-            'status_choices': ClientProject.STATUS_CHOICES,
-        }
-    )
-
-@login_required
-def admin_project_detail(request, project_id):
-    if not request.user.is_staff:
-        return redirect('dashboard')
-
-    project = ClientProject.objects.get(id=project_id)
-
-    return render(request, 'home/admin_project_detail.html', {
-        'project': project,
-    })
-
-
-@login_required
-def admin_edit_project(request, project_id):
-    if not request.user.is_staff:
-        return redirect('dashboard')
-
-    project = ClientProject.objects.get(id=project_id)
-    clients = User.objects.filter(is_staff=False)
-
-    if request.method == 'POST':
-        project.client = User.objects.get(id=request.POST.get('client'))
-        project.title = request.POST.get('title')
-        project.description = request.POST.get('description')
-        project.status = request.POST.get('status')
-        project.progress = request.POST.get('progress') or 0
-        project.admin_notes = request.POST.get('admin_notes')
-        project.save()
-
-        messages.success(request, 'Project updated successfully.')
-        return redirect('admin_project_detail', project_id=project.id)
-
-    return render(request, 'home/admin_edit_project.html', {
-        'project': project,
-        'clients': clients,
-        'status_choices': ClientProject.STATUS_CHOICES,
-    })
+    return render(request, 'home/admin_projects.html', {'projects': projects})
 
 
 @login_required
 def admin_create_project(request):
-
     if not request.user.is_staff:
         return redirect('dashboard')
 
     clients = User.objects.filter(is_staff=False)
 
     if request.method == 'POST':
-
         existing_client_id = request.POST.get('existing_client')
         new_client_username = request.POST.get('new_client_username', '').strip()
         new_client_email = request.POST.get('new_client_email', '').strip()
 
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        status = request.POST.get('status')
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        status = request.POST.get('status', 'new')
         progress = request.POST.get('progress') or 0
 
         if existing_client_id:
-            client = User.objects.get(id=existing_client_id)
+            client = get_object_or_404(User, id=existing_client_id)
         else:
             if not new_client_username or not new_client_email:
                 messages.error(request, 'Select existing client or create a new client.')
@@ -378,7 +250,7 @@ def admin_create_project(request):
             client = User.objects.create_user(
                 username=new_client_username,
                 email=new_client_email,
-                password='TemporaryPassword123!'
+                password='TemporaryPassword123!',
             )
 
         ClientProject.objects.create(
@@ -398,5 +270,145 @@ def admin_create_project(request):
         {
             'clients': clients,
             'status_choices': ClientProject.STATUS_CHOICES,
-        }
+        },
     )
+
+
+@login_required
+def admin_project_detail(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = get_object_or_404(ClientProject, id=project_id)
+
+    return render(request, 'home/admin_project_detail.html', {'project': project})
+
+
+@login_required
+def admin_edit_project(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = get_object_or_404(ClientProject, id=project_id)
+    clients = User.objects.filter(is_staff=False)
+
+    if request.method == 'POST':
+        project.client = get_object_or_404(User, id=request.POST.get('client'))
+        project.title = request.POST.get('title', '').strip()
+        project.description = request.POST.get('description', '').strip()
+        project.status = request.POST.get('status', 'new')
+        project.progress = request.POST.get('progress') or 0
+        project.admin_notes = request.POST.get('admin_notes', '').strip()
+        project.save()
+
+        messages.success(request, 'Project updated successfully.')
+        return redirect('admin_project_detail', project_id=project.id)
+
+    return render(
+        request,
+        'home/admin_edit_project.html',
+        {
+            'project': project,
+            'clients': clients,
+            'status_choices': ClientProject.STATUS_CHOICES,
+        },
+    )
+
+
+@login_required
+def admin_delete_project(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = get_object_or_404(ClientProject, id=project_id)
+
+    if request.method == 'POST':
+        project.delete()
+        messages.success(request, 'Project deleted successfully.')
+        return redirect('admin_projects')
+
+    return render(request, 'home/admin_delete_project.html', {'project': project})
+
+@login_required
+def admin_clients(request):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    clients = User.objects.filter(is_staff=False).order_by('-date_joined')
+
+    return render(request, 'home/admin_clients.html', {
+        'clients': clients,
+    })
+
+
+@login_required
+def admin_create_client(request):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        if not username or not email or not password:
+            messages.error(request, 'Please complete all fields.')
+            return redirect('admin_create_client')
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+        )
+
+        messages.success(request, 'Client created successfully.')
+        return redirect('admin_clients')
+
+    return render(request, 'home/admin_client_form.html', {
+        'page_title': 'Create Client',
+        'client': None,
+    })
+
+
+@login_required
+def admin_edit_client(request, client_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    client = get_object_or_404(User, id=client_id, is_staff=False)
+
+    if request.method == 'POST':
+        client.username = request.POST.get('username', '').strip()
+        client.email = request.POST.get('email', '').strip()
+        client.is_active = request.POST.get('is_active') == 'on'
+
+        password = request.POST.get('password', '').strip()
+        if password:
+            client.set_password(password)
+
+        client.save()
+
+        messages.success(request, 'Client updated successfully.')
+        return redirect('admin_clients')
+
+    return render(request, 'home/admin_client_form.html', {
+        'page_title': 'Edit Client',
+        'client': client,
+    })
+
+
+@login_required
+def admin_delete_client(request, client_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    client = get_object_or_404(User, id=client_id, is_staff=False)
+
+    if request.method == 'POST':
+        client.delete()
+        messages.success(request, 'Client deleted successfully.')
+        return redirect('admin_clients')
+
+    return render(request, 'home/admin_delete_client.html', {
+        'client': client,
+    })

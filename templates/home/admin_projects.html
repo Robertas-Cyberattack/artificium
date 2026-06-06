@@ -3,7 +3,9 @@
 {% block extra_title %} | Admin Projects{% endblock %}
 
 {% block content %}
+
 <section class="py-5 bg-light">
+
     <div class="container py-lg-4">
 
         <div class="mb-5">
@@ -16,24 +18,24 @@
             </h1>
 
             <p class="lead text-muted mb-0">
-                View and manage all client projects.
+                View, create, edit and delete client projects.
             </p>
         </div>
 
         <div class="bg-white border shadow-sm p-4">
+
             <div class="mb-4 text-right">
                 <a href="{% url 'admin_create_project' %}" class="btn btn-dark">
-              Create Project
-             </a>
-        </div>
+                    Create New Project
+                </a>
+            </div>
+
             {% if projects %}
+
                 <div class="table-responsive">
+
                     <table class="table table-bordered mb-0">
-                        <div class="mb-4 text-right">
-    <a href="{% url 'admin_create_project' %}" class="btn btn-dark">
-        Create Project
-    </a>
-</div>
+
                         <thead>
                             <tr>
                                 <th>Project</th>
@@ -42,60 +44,77 @@
                                 <th>Progress</th>
                                 <th>Due Date</th>
                                 <th>Created</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
 
-    {% for project in projects %}
+                            {% for project in projects %}
 
-        <tr>
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'admin_project_detail' project.id %}">
+                                            {{ project.title }}
+                                        </a>
+                                    </td>
 
-            <td>
-                <a href="{% url 'admin_project_detail' project.id %}">
-                    {{ project.title }}
-                </a>
-            </td>
+                                    <td>{{ project.client.username }}</td>
 
-            <td>
-                {{ project.client.username }}
-            </td>
+                                    <td>{{ project.get_status_display }}</td>
 
-            <td>
-                {{ project.get_status_display }}
-            </td>
+                                    <td>{{ project.progress }}%</td>
 
-            <td>
-                {{ project.progress }}%
-            </td>
+                                    <td>
+                                        {% if project.due_date %}
+                                            {{ project.due_date|date:"d M Y" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
 
-            <td>
-                {% if project.due_date %}
-                    {{ project.due_date|date:"d M Y" }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
+                                    <td>
+                                        {{ project.created_at|date:"d M Y" }}
+                                    </td>
 
-            <td>
-                {{ project.created_at|date:"d M Y" }}
-            </td>
+                                    <td>
+                                        <a href="{% url 'admin_project_detail' project.id %}"
+                                           class="btn btn-sm btn-outline-secondary mb-1">
+                                            View
+                                        </a>
 
-        </tr>
+                                        <a href="{% url 'admin_edit_project' project.id %}"
+                                           class="btn btn-sm btn-outline-dark mb-1">
+                                            Edit
+                                        </a>
 
-    {% endfor %}
+                                        <a href="{% url 'admin_delete_project' project.id %}"
+                                           class="btn btn-sm btn-outline-danger mb-1">
+                                            Delete
+                                        </a>
+                                    </td>
+                                </tr>
 
-</tbody>
+                            {% endfor %}
+
+                        </tbody>
+
                     </table>
+
                 </div>
+
             {% else %}
+
                 <p class="text-muted mb-0">
                     No projects created yet.
                 </p>
+
             {% endif %}
 
         </div>
 
     </div>
+
 </section>
+
 {% endblock %}

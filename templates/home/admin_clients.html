@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | Admin Clients{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+
+        <div class="mb-5">
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">
+                Admin Area
+            </p>
+
+            <h1 class="font-weight-bold">
+                Clients
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Create, edit and delete client accounts.
+            </p>
+        </div>
+
+        <div class="bg-white border shadow-sm p-4">
+
+            <div class="mb-4 text-right">
+                <a href="{% url 'admin_create_client' %}" class="btn btn-dark">
+                    Create New Client
+                </a>
+            </div>
+
+            {% if clients %}
+
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Date Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for client in clients %}
+                                <tr>
+                                    <td>{{ client.username }}</td>
+                                    <td>{{ client.email }}</td>
+
+                                    <td>
+                                        {% if client.is_active %}
+                                            Active
+                                        {% else %}
+                                            Disabled
+                                        {% endif %}
+                                    </td>
+
+                                    <td>{{ client.date_joined|date:"d M Y" }}</td>
+
+                                    <td>
+                                        <a href="{% url 'admin_edit_client' client.id %}"
+                                           class="btn btn-sm btn-outline-dark mb-1">
+                                            Edit
+                                        </a>
+
+                                        <a href="{% url 'admin_delete_client' client.id %}"
+                                           class="btn btn-sm btn-outline-danger mb-1">
+                                            Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">
+                    No clients found.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

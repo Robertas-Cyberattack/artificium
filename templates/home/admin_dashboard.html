@@ -34,10 +34,12 @@
             </div>
 
             <div class="col-md-3 mb-3">
-                <div class="bg-white border shadow-sm p-4">
-                    <h3>{{ projects.count }}</h3>
-                    <p class="text-muted mb-0">Projects</p>
-                </div>
+                <a href="{% url 'admin_projects' %}" class="text-decoration-none text-dark">
+                    <div class="bg-white border shadow-sm p-4">
+                        <h3>{{ projects.count }}</h3>
+                        <p class="text-muted mb-0">Projects</p>
+                    </div>
+                </a>
             </div>
 
             <div class="col-md-3 mb-3">
