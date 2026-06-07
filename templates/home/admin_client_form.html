@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | {{ page_title }}{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+
+        <div class="mb-5">
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">
+                Admin Area
+            </p>
+
+            <h1 class="font-weight-bold">
+                {{ page_title }}
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Create or edit client account details.
+            </p>
+        </div>
+
+        <div class="bg-white border shadow-sm p-4">
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">
+                        Username
+                    </label>
+
+                    <input type="text"
+                           name="username"
+                           class="form-control"
+                           value="{% if client %}{{ client.username }}{% endif %}"
+                           required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           name="email"
+                           class="form-control"
+                           value="{% if client %}{{ client.email }}{% endif %}"
+                           required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">
+                        Password
+                    </label>
+
+                    <input type="password"
+                           name="password"
+                           class="form-control"
+                           {% if not client %}required{% endif %}>
+
+                    {% if client %}
+                        <small class="text-muted">
+                            Leave blank if you do not want to change the password.
+                        </small>
+                    {% endif %}
+                </div>
+
+                {% if client %}
+                    <div class="form-group mb-4">
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   name="is_active"
+                                   id="is_active"
+                                   class="form-check-input"
+                                   {% if client.is_active %}checked{% endif %}>
+
+                            <label for="is_active" class="form-check-label">
+                                Active account
+                            </label>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-dark">
+                    Save Client
+                </button>
+
+                <a href="{% url 'admin_clients' %}" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

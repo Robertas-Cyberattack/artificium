@@ -536,6 +536,7 @@ def admin_delete_client(request, client_id):
 
     return render(request, 'home/admin_delete_client.html', {'client': client})
 
+
 @login_required
 def client_edit_project(request, project_id):
     if request.user.is_staff:
@@ -589,3 +590,64 @@ def client_delete_project(request, project_id):
         'project': project,
     })
 
+
+@login_required
+def client_project_messages(request, project_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    project = get_object_or_404(
+        ClientProject,
+        id=project_id,
+        client=request.user,
+    )
+
+    if request.method == 'POST':
+        message_text = request.POST.get('message', '').strip()
+
+        if message_text:
+            ProjectMessage.objects.create(
+                project=project,
+                sender=request.user,
+                message=message_text,
+                is_admin_message=False,
+            )
+            messages.success(request, 'Message sent successfully.')
+
+        return redirect('client_project_messages', project_id=project.id)
+
+    project_messages = project.messages.all().order_by('created_at')
+
+    return render(request, 'home/client_project_messages.html', {
+        'project': project,
+        'project_messages': project_messages,
+    })
+
+
+@login_required
+def admin_project_messages(request, project_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    project = get_object_or_404(ClientProject, id=project_id)
+
+    if request.method == 'POST':
+        message_text = request.POST.get('message', '').strip()
+
+        if message_text:
+            ProjectMessage.objects.create(
+                project=project,
+                sender=request.user,
+                message=message_text,
+                is_admin_message=True,
+            )
+            messages.success(request, 'Message sent successfully.')
+
+        return redirect('admin_project_messages', project_id=project.id)
+
+    project_messages = project.messages.all().order_by('created_at')
+
+    return render(request, 'home/admin_project_messages.html', {
+        'project': project,
+        'project_messages': project_messages,
+    })
