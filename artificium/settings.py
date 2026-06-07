@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'home',
+    'projects',
+    'payments',
 ]
 
 SITE_ID = 1
