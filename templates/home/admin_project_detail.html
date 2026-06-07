@@ -3,37 +3,162 @@
 {% block extra_title %} | Project Detail{% endblock %}
 
 {% block content %}
+
 <section class="py-5 bg-light">
     <div class="container py-lg-4">
 
         <div class="mb-4">
-            <p class="text-uppercase font-weight-bold text-secondary mb-2">Admin Area</p>
-            <h1 class="font-weight-bold">{{ project.title }}</h1>
-            <p class="lead text-muted mb-0">Client: {{ project.client.username }}</p>
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">
+                Admin Area
+            </p>
+
+            <h1 class="font-weight-bold">
+                {{ project.title }}
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Client: {{ project.client.username }}
+            </p>
         </div>
 
         <div class="bg-white border shadow-sm p-4 mb-4">
-            <p><strong>Status:</strong> {{ project.get_status_display }}</p>
-            <p><strong>Progress:</strong> {{ project.progress }}%</p>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <p><strong>Status:</strong> {{ project.get_status_display }}</p>
+                    <p><strong>Progress:</strong> {{ project.progress }}%</p>
+
+                    <p><strong>Price:</strong>
+                        {% if project.price %}
+                            £{{ project.price }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Payment:</strong>
+                        {% if project.is_paid %}
+                            <span class="badge badge-success">Paid</span>
+                        {% else %}
+                            <span class="badge badge-warning">Unpaid</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Invoice:</strong>
+                        {% if project.invoice_number %}
+                            {{ project.invoice_number }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Created:</strong> {{ project.created_at|date:"d M Y H:i" }}</p>
+                    <p><strong>Updated:</strong> {{ project.updated_at|date:"d M Y H:i" }}</p>
+
+                    <p><strong>Messages:</strong>
+                        {% if project.messages.count %}
+                            <span class="badge badge-dark">
+                                {{ project.messages.count }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">0</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+            </div>
+
+            <hr>
+
             <p><strong>Description:</strong></p>
-            <p class="text-muted">{{ project.description }}</p>
+            <p class="text-muted">
+                {{ project.description|default:"No description provided." }}
+            </p>
+
+            <p><strong>Client Notes:</strong></p>
+            <p class="text-muted">
+                {{ project.client_notes|default:"No client notes provided." }}
+            </p>
 
             <p><strong>Admin Notes:</strong></p>
-            <p class="text-muted">{{ project.admin_notes }}</p>
+            <p class="text-muted">
+                {{ project.admin_notes|default:"No admin notes added." }}
+            </p>
 
-            <a href="{% url 'admin_edit_project' project.id %}" class="btn btn-dark">
-                Edit Project
-            </a>
+            {% if project.messages.count %}
+                <hr>
 
-            <a href="{% url 'admin_delete_project' project.id %}" class="btn btn-outline-danger">
-                Delete Project
-            </a>
+                <h2 class="h5 mb-3">
+                    Conversation Preview
+                </h2>
 
-            <a href="{% url 'admin_projects' %}" class="btn btn-outline-secondary">
-                Back
-            </a>
+                {% for message in project.messages.all %}
+
+                    <div class="border rounded p-3 mb-2 {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
+
+                        <div class="d-flex justify-content-between">
+                            <strong>
+                                {% if message.is_admin_message %}
+                                    Admin
+                                {% else %}
+                                    {{ message.sender.username }}
+                                {% endif %}
+                            </strong>
+
+                            <small class="text-muted">
+                                {{ message.created_at|date:"d M Y H:i" }}
+                            </small>
+                        </div>
+
+                        <p class="mb-1 mt-2">
+                            {{ message.message }}
+                        </p>
+
+                        {% if not message.is_admin_message and not message.is_read_by_admin %}
+                            <span class="badge badge-danger">
+                                New Client Message
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+            <div class="mt-4">
+
+                <a href="{% url 'admin_edit_project' project.id %}" class="btn btn-dark mb-1">
+                    Edit Project
+                </a>
+
+                <a href="{% url 'admin_project_messages' project.id %}" class="btn btn-outline-primary mb-1">
+                    <i class="fas fa-envelope"></i>
+                    Messages
+
+                    {% if project.messages.count %}
+                        <span class="badge badge-dark">
+                            {{ project.messages.count }}
+                        </span>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'admin_delete_project' project.id %}" class="btn btn-outline-danger mb-1">
+                    Delete Project
+                </a>
+
+                <a href="{% url 'admin_projects' %}" class="btn btn-outline-secondary mb-1">
+                    Back
+                </a>
+
+            </div>
+
         </div>
 
     </div>
 </section>
+
 {% endblock %}

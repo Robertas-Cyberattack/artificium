@@ -590,7 +590,6 @@ def client_delete_project(request, project_id):
         'project': project,
     })
 
-
 @login_required
 def client_project_messages(request, project_id):
     if request.user.is_staff:
@@ -602,6 +601,12 @@ def client_project_messages(request, project_id):
         client=request.user,
     )
 
+    ProjectMessage.objects.filter(
+        project=project,
+        is_admin_message=True,
+        is_read_by_client=False,
+    ).update(is_read_by_client=True)
+
     if request.method == 'POST':
         message_text = request.POST.get('message', '').strip()
 
@@ -611,7 +616,10 @@ def client_project_messages(request, project_id):
                 sender=request.user,
                 message=message_text,
                 is_admin_message=False,
+                is_read_by_admin=False,
+                is_read_by_client=True,
             )
+
             messages.success(request, 'Message sent successfully.')
 
         return redirect('client_project_messages', project_id=project.id)
@@ -631,6 +639,12 @@ def admin_project_messages(request, project_id):
 
     project = get_object_or_404(ClientProject, id=project_id)
 
+    ProjectMessage.objects.filter(
+        project=project,
+        is_admin_message=False,
+        is_read_by_admin=False,
+    ).update(is_read_by_admin=True)
+
     if request.method == 'POST':
         message_text = request.POST.get('message', '').strip()
 
@@ -640,7 +654,10 @@ def admin_project_messages(request, project_id):
                 sender=request.user,
                 message=message_text,
                 is_admin_message=True,
+                is_read_by_admin=True,
+                is_read_by_client=False,
             )
+
             messages.success(request, 'Message sent successfully.')
 
         return redirect('admin_project_messages', project_id=project.id)
@@ -650,4 +667,92 @@ def admin_project_messages(request, project_id):
     return render(request, 'home/admin_project_messages.html', {
         'project': project,
         'project_messages': project_messages,
+    })
+
+@login_required
+def client_edit_message(request, message_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    message_obj = get_object_or_404(
+        ProjectMessage,
+        id=message_id,
+        sender=request.user,
+        is_admin_message=False,
+    )
+
+    if message_obj.is_read_by_admin:
+        messages.error(request, 'You cannot edit this message because admin has already seen it.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        message_obj.message = request.POST.get('message', '').strip()
+        message_obj.save()
+        messages.success(request, 'Message updated successfully.')
+        return redirect('dashboard')
+
+    return render(request, 'home/client_edit_message.html', {
+        'message_obj': message_obj,
+    })
+
+
+@login_required
+def client_delete_message(request, message_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    message_obj = get_object_or_404(
+        ProjectMessage,
+        id=message_id,
+        sender=request.user,
+        is_admin_message=False,
+    )
+
+    if message_obj.is_read_by_admin:
+        messages.error(request, 'You cannot delete this message because admin has already seen it.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        message_obj.delete()
+        messages.success(request, 'Message deleted successfully.')
+        return redirect('dashboard')
+
+    return render(request, 'home/client_delete_message.html', {
+        'message_obj': message_obj,
+    })
+
+
+@login_required
+def admin_edit_message(request, message_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    message_obj = get_object_or_404(ProjectMessage, id=message_id)
+
+    if request.method == 'POST':
+        message_obj.message = request.POST.get('message', '').strip()
+        message_obj.save()
+        messages.success(request, 'Message updated successfully.')
+        return redirect('admin_project_messages', project_id=message_obj.project.id)
+
+    return render(request, 'home/admin_edit_message.html', {
+        'message_obj': message_obj,
+    })
+
+
+@login_required
+def admin_delete_message(request, message_id):
+    if not request.user.is_staff:
+        return redirect('dashboard')
+
+    message_obj = get_object_or_404(ProjectMessage, id=message_id)
+    project_id = message_obj.project.id
+
+    if request.method == 'POST':
+        message_obj.delete()
+        messages.success(request, 'Message deleted successfully.')
+        return redirect('admin_project_messages', project_id=project_id)
+
+    return render(request, 'home/admin_delete_message.html', {
+        'message_obj': message_obj,
     })

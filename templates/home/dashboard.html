@@ -35,18 +35,22 @@
 
             <div class="col-md-4 mb-3">
                 <div class="bg-white border shadow-sm p-4 h-100">
-                    <h3>
-                        {% with unpaid_count=0 %}
-                            {{ unpaid_count }}
-                        {% endwith %}
-                    </h3>
+                    <h3>0</h3>
                     <p class="text-muted mb-0">Payments Due</p>
                 </div>
             </div>
 
             <div class="col-md-4 mb-3">
                 <div class="bg-white border shadow-sm p-4 h-100">
-                    <h3>0</h3>
+                    <h3>
+                        {% for project in projects %}
+                            {% if project.messages.count %}
+                                {{ project.messages.count }}
+                            {% endif %}
+                        {% empty %}
+                            0
+                        {% endfor %}
+                    </h3>
                     <p class="text-muted mb-0">Messages</p>
                 </div>
             </div>
@@ -89,8 +93,97 @@
 
                                 <tr>
 
-                                    <td>
-                                        {{ project.title }}
+                                    <td style="min-width: 320px;">
+                                        <strong>{{ project.title }}</strong>
+
+                                        {% if project.messages.count %}
+                                            <div class="small text-muted mt-1">
+                                                <i class="fas fa-envelope"></i>
+                                                {{ project.messages.count }} message{% if project.messages.count != 1 %}s{% endif %}
+                                            </div>
+                                        {% endif %}
+
+                                        {% for message in project.messages.all %}
+                                            {% if message.is_admin_message and not message.is_read_by_client %}
+                                                <span class="badge badge-danger mt-2">
+                                                    New admin message
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        <div class="mt-3 border-top pt-2">
+
+                                            <strong class="small">
+                                                Conversation:
+                                            </strong>
+
+                                            {% if project.messages.count %}
+
+                                                {% for message in project.messages.all %}
+
+                                                    <div class="small mt-2 p-2 border rounded {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
+
+                                                        <div class="d-flex justify-content-between">
+                                                            <strong>
+                                                                {% if message.is_admin_message %}
+                                                                    Admin
+                                                                {% else %}
+                                                                    You
+                                                                {% endif %}
+                                                            </strong>
+
+                                                            <span class="text-muted">
+                                                                {{ message.created_at|date:"d M Y H:i" }}
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="mt-1">
+                                                            {{ message.message }}
+                                                        </div>
+
+                                                        {% if not message.is_admin_message and not message.is_read_by_admin %}
+                                                            <div class="mt-1">
+                                                                <a href="{% url 'client_edit_message' message.id %}" class="small">
+                                                                    Edit
+                                                                </a>
+
+                                                                <span class="text-muted mx-1">|</span>
+
+                                                                <a href="{% url 'client_delete_message' message.id %}" class="small text-danger">
+                                                                    Delete
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+
+                                                    </div>
+
+                                                {% endfor %}
+
+                                            {% else %}
+
+                                                <p class="small text-muted mb-0 mt-2">
+                                                    No messages yet.
+                                                </p>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                        <form method="post"
+                                              action="{% url 'client_project_messages' project.id %}"
+                                              class="mt-3">
+                                            {% csrf_token %}
+
+                                            <textarea name="message"
+                                                      class="form-control mb-2"
+                                                      rows="2"
+                                                      placeholder="Write message to admin..."
+                                                      required></textarea>
+
+                                            <button type="submit" class="btn btn-sm btn-outline-dark">
+                                                Send Message
+                                            </button>
+                                        </form>
                                     </td>
 
                                     <td>
@@ -127,7 +220,7 @@
                                         {% elif project.price > 0 %}
 
                                             <a href="{% url 'create_project_payment' project.id %}"
-                                               class="btn btn-sm btn-dark">
+                                               class="btn btn-sm btn-dark mb-1">
                                                 Pay Now
                                             </a>
 
@@ -141,22 +234,34 @@
                                     </td>
 
                                     <td>
+                                        <a href="{% url 'client_project_messages' project.id %}"
+                                           class="btn btn-sm btn-outline-secondary mb-1">
+                                            <i class="fas fa-envelope"></i>
+                                            Open Messages
+
+                                            {% if project.messages.count %}
+                                                <span class="badge badge-dark">
+                                                    {{ project.messages.count }}
+                                                </span>
+                                            {% endif %}
+                                        </a>
+
                                         {% if project.status == 'requested' and not project.is_paid %}
 
                                             <a href="{% url 'client_edit_project' project.id %}"
                                                class="btn btn-sm btn-outline-dark mb-1">
-                                                Edit
+                                                Edit Project
                                             </a>
 
                                             <a href="{% url 'client_delete_project' project.id %}"
                                                class="btn btn-sm btn-outline-danger mb-1">
-                                                Delete
+                                                Delete Project
                                             </a>
 
                                         {% else %}
 
-                                            <span class="text-muted">
-                                                Locked
+                                            <span class="text-muted d-block">
+                                                Project Locked
                                             </span>
 
                                         {% endif %}

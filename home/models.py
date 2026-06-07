@@ -38,18 +38,22 @@ class ClientProject(models.Model):
     def __str__(self):
         return self.title
     
-    
+
 class ProjectMessage(models.Model):
     project = models.ForeignKey(ClientProject, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     is_admin_message = models.BooleanField(default=False)
+
+    is_read_by_admin = models.BooleanField(default=False)
+    is_read_by_client = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Message for {self.project.title}'
-
-
+    
+    
 class ProjectFile(models.Model):
     project = models.ForeignKey(ClientProject, on_delete=models.CASCADE, related_name='files')
     title = models.CharField(max_length=200)

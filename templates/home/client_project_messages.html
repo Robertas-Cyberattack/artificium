@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | Project Messages{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+
+        <div class="mb-5">
+            <p class="text-uppercase font-weight-bold text-secondary mb-2">
+                Client Area
+            </p>
+
+            <h1 class="font-weight-bold">
+                Messages - {{ project.title }}
+            </h1>
+
+            <p class="lead text-muted mb-0">
+                Full conversation between you and admin for this project.
+            </p>
+        </div>
+
+        <div class="bg-white border shadow-sm p-4 mb-4">
+
+            <h2 class="h5 mb-4">
+                Conversation
+            </h2>
+
+            {% for message in project_messages %}
+
+                <div class="border rounded p-3 mb-3 {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+                            <strong>
+                                {% if message.is_admin_message %}
+                                    Admin
+                                {% else %}
+                                    You
+                                {% endif %}
+                            </strong>
+
+                            {% if message.is_admin_message and not message.is_read_by_client %}
+                                <span class="badge badge-danger ml-2">
+                                    New
+                                </span>
+                            {% endif %}
+
+                            {% if not message.is_admin_message and not message.is_read_by_admin %}
+                                <span class="badge badge-warning ml-2">
+                                    Not seen by admin
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <small class="text-muted">
+                            {{ message.created_at|date:"d M Y H:i" }}
+                        </small>
+
+                    </div>
+
+                    <p class="mb-2 mt-2">
+                        {{ message.message }}
+                    </p>
+
+                    {% if not message.is_admin_message and not message.is_read_by_admin %}
+                        <div class="small">
+                            <a href="{% url 'client_edit_message' message.id %}">
+                                Edit
+                            </a>
+
+                            <span class="text-muted mx-1">|</span>
+
+                            <a href="{% url 'client_delete_message' message.id %}"
+                               class="text-danger">
+                                Delete
+                            </a>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            {% empty %}
+
+                <p class="text-muted mb-0">
+                    No messages yet. Send a message to admin below.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="bg-white border shadow-sm p-4">
+
+            <h2 class="h5 mb-3">
+                Send New Message
+            </h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="font-weight-bold">
+                        Message
+                    </label>
+
+                    <textarea
+                        name="message"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Write your message to admin..."
+                        required
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark">
+                    Send Message
+                </button>
+
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                    Back to Dashboard
+                </a>
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
