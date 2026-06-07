@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | Edit Project{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+        <h1 class="font-weight-bold mb-4">Edit Project</h1>
+
+        <div class="bg-white border shadow-sm p-4">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">Project Title</label>
+                    <input type="text" name="title" class="form-control" value="{{ project.title }}" required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">Description</label>
+                    <textarea name="description" class="form-control" rows="5">{{ project.description }}</textarea>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Notes for Admin</label>
+                    <textarea name="client_notes" class="form-control" rows="4">{{ project.client_notes }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark">
+                    Save Changes
+                </button>
+
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -24,6 +24,35 @@
 
         </div>
 
+        <div class="row mb-4">
+
+            <div class="col-md-4 mb-3">
+                <div class="bg-white border shadow-sm p-4 h-100">
+                    <h3>{{ projects.count }}</h3>
+                    <p class="text-muted mb-0">My Projects</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="bg-white border shadow-sm p-4 h-100">
+                    <h3>
+                        {% with unpaid_count=0 %}
+                            {{ unpaid_count }}
+                        {% endwith %}
+                    </h3>
+                    <p class="text-muted mb-0">Payments Due</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="bg-white border shadow-sm p-4 h-100">
+                    <h3>0</h3>
+                    <p class="text-muted mb-0">Messages</p>
+                </div>
+            </div>
+
+        </div>
+
         <div class="mb-4 text-right">
             <a href="{% url 'client_create_project' %}" class="btn btn-dark">
                 New Project
