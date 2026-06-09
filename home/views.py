@@ -333,6 +333,62 @@ def privacy(request):
 
 
 @login_required
+def upload_project_file(request, project_id):
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+
+    project = get_object_or_404(
+        ClientProject,
+        id=project_id,
+        client=request.user,
+    )
+
+    if request.method == 'POST':
+
+        uploaded_file = request.FILES.get('file')
+        title = request.POST.get('title', '').strip()
+
+        if not uploaded_file:
+            messages.error(request, 'Please select a file.')
+            return redirect('dashboard')
+
+        if not title:
+            title = uploaded_file.name
+
+        ProjectFile.objects.create(
+            project=project,
+            title=title,
+            file=uploaded_file,
+            uploaded_by=request.user,
+            visible_to_client=True,
+        )
+
+        messages.success(request, 'File uploaded successfully.')
+
+    return redirect('dashboard')
+
+
+@login_required
+def delete_project_file(request, file_id):
+    file_obj = get_object_or_404(ProjectFile, id=file_id)
+
+    if not request.user.is_staff:
+        if file_obj.project.client != request.user:
+            return redirect('dashboard')
+
+    if request.method == 'POST':
+
+        if file_obj.file:
+            file_obj.file.delete(save=False)
+
+        file_obj.delete()
+
+        messages.success(request, 'File deleted successfully.')
+
+    return redirect('dashboard')
+
+
+@login_required
 def dashboard(request):
     if request.user.is_staff:
         return redirect('admin_dashboard')

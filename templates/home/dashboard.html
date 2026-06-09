@@ -18,7 +18,7 @@
             </h1>
 
             <p class="lead text-muted mb-0">
-                Manage your projects, quotes, payments and messages.
+                Manage your projects, quotes, payments, files and messages.
             </p>
         </div>
 
@@ -62,7 +62,7 @@
                 <input type="text"
                        id="project-search"
                        class="form-control"
-                       placeholder="Search projects, status, invoice or messages...">
+                       placeholder="Search projects, status, invoice, files or messages...">
             </div>
         </div>
 
@@ -96,7 +96,7 @@
 
                                 <tr class="project-row">
 
-                                    <td style="min-width: 320px;">
+                                    <td style="min-width: 360px;">
                                         <strong>{{ project.title }}</strong>
 
                                         {% if project.messages.count %}
@@ -113,6 +113,83 @@
                                                 </span>
                                             {% endif %}
                                         {% endfor %}
+
+                                        <div class="mt-3 border-top pt-2">
+
+                                            <strong class="small">
+                                                Project Files:
+                                            </strong>
+
+                                            {% if project.files.all %}
+
+                                                <ul class="list-group mt-2 mb-3">
+
+                                                    {% for file in project.files.all %}
+
+                                                        <li class="list-group-item d-flex justify-content-between align-items-center small">
+
+                                                            <div>
+                                                                <i class="fas fa-paperclip"></i>
+
+                                                                <a href="{{ file.file.url }}"
+                                                                   target="_blank"
+                                                                   rel="noopener">
+                                                                    {{ file.title }}
+                                                                </a>
+
+                                                                <div class="text-muted">
+                                                                    Uploaded:
+                                                                    {{ file.uploaded_at|date:"d M Y H:i" }}
+                                                                </div>
+                                                            </div>
+
+                                                            <form method="post"
+                                                                  action="{% url 'delete_project_file' file.id %}">
+                                                                {% csrf_token %}
+
+                                                                <button type="submit"
+                                                                        class="btn btn-sm btn-outline-danger">
+                                                                    Delete
+                                                                </button>
+                                                            </form>
+
+                                                        </li>
+
+                                                    {% endfor %}
+
+                                                </ul>
+
+                                            {% else %}
+
+                                                <p class="small text-muted mb-2 mt-2">
+                                                    No files uploaded yet.
+                                                </p>
+
+                                            {% endif %}
+
+                                            <form method="post"
+                                                  enctype="multipart/form-data"
+                                                  action="{% url 'upload_project_file' project.id %}"
+                                                  class="mb-3">
+                                                {% csrf_token %}
+
+                                                <input type="text"
+                                                       name="title"
+                                                       class="form-control form-control-sm mb-2"
+                                                       placeholder="File title">
+
+                                                <input type="file"
+                                                       name="file"
+                                                       class="form-control form-control-sm mb-2"
+                                                       required>
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-dark">
+                                                    Upload File
+                                                </button>
+                                            </form>
+
+                                        </div>
 
                                         <div class="mt-3 border-top pt-2">
 
