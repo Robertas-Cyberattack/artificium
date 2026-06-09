@@ -98,6 +98,13 @@ urlpatterns = [
         name='create_project_payment'
     ),
 
+
+    path(
+    'dashboard/projects/<int:project_id>/invoice/',
+    views.download_invoice,
+    name='download_invoice'
+    ),
+
     path(
         'dashboard/projects/<int:project_id>/messages/',
         views.client_project_messages,

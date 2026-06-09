@@ -9,7 +9,6 @@
     <div class="container py-lg-4">
 
         <div class="mb-5">
-
             <p class="text-uppercase font-weight-bold text-secondary mb-2">
                 Client Area
             </p>
@@ -21,7 +20,6 @@
             <p class="lead text-muted mb-0">
                 Manage your projects, quotes, payments and messages.
             </p>
-
         </div>
 
         <div class="row mb-4">
@@ -42,16 +40,8 @@
 
             <div class="col-md-4 mb-3">
                 <div class="bg-white border shadow-sm p-4 h-100">
-                    <h3>
-                        {% for project in projects %}
-                            {% if project.messages.count %}
-                                {{ project.messages.count }}
-                            {% endif %}
-                        {% empty %}
-                            0
-                        {% endfor %}
-                    </h3>
-                    <p class="text-muted mb-0">Messages</p>
+                    <h3>{{ projects.count }}</h3>
+                    <p class="text-muted mb-0">Project Conversations</p>
                 </div>
             </div>
 
@@ -61,6 +51,19 @@
             <a href="{% url 'client_create_project' %}" class="btn btn-dark">
                 New Project
             </a>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label for="project-search" class="font-weight-bold">
+                    Search Projects
+                </label>
+
+                <input type="text"
+                       id="project-search"
+                       class="form-control"
+                       placeholder="Search projects, status, invoice or messages...">
+            </div>
         </div>
 
         <div class="bg-white border shadow-sm p-4">
@@ -91,7 +94,7 @@
 
                             {% for project in projects %}
 
-                                <tr>
+                                <tr class="project-row">
 
                                     <td style="min-width: 320px;">
                                         <strong>{{ project.title }}</strong>
@@ -140,6 +143,22 @@
                                                         <div class="mt-1">
                                                             {{ message.message }}
                                                         </div>
+
+                                                        {% if not message.is_admin_message %}
+
+                                                            <div class="mt-1">
+                                                                {% if message.is_read_by_admin %}
+                                                                    <span class="badge badge-success">
+                                                                        Seen by admin
+                                                                    </span>
+                                                                {% else %}
+                                                                    <span class="badge badge-warning">
+                                                                        Not seen by admin
+                                                                    </span>
+                                                                {% endif %}
+                                                            </div>
+
+                                                        {% endif %}
 
                                                         {% if not message.is_admin_message and not message.is_read_by_admin %}
                                                             <div class="mt-1">
@@ -213,9 +232,15 @@
                                     <td>
                                         {% if project.is_paid %}
 
-                                            <span class="badge badge-success">
+                                            <span class="badge badge-success d-block mb-2">
                                                 Paid
                                             </span>
+
+                                            <a href="{% url 'download_invoice' project.id %}"
+                                               class="btn btn-sm btn-outline-dark">
+                                                <i class="fas fa-file-pdf"></i>
+                                                Download Invoice
+                                            </a>
 
                                         {% elif project.price > 0 %}
 

@@ -6,11 +6,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import ClientProject, ProjectFile, ProjectMessage
+from .models import ClientProject, ProjectFile, ProjectMessage, Invoice
+from .utils import generate_invoice_pdf
 
 
 def index(request):
@@ -221,14 +223,101 @@ def payment_success(request):
                 project = ClientProject.objects.filter(id=project_id).first()
 
                 if project:
+                    if not project.invoice_number:
+                        project.invoice_number = f'INV-{project.id}'
+
                     project.is_paid = True
                     project.status = 'paid'
                     project.save()
+
+                    invoice, created = Invoice.objects.get_or_create(
+                        project=project,
+                        defaults={
+                            'client': project.client,
+                            'invoice_number': project.invoice_number,
+                            'amount': project.price,
+                            'description': f'Payment for {project.title}',
+                            'status': 'paid',
+                        }
+                    )
+
+                    invoice.client = project.client
+                    invoice.invoice_number = project.invoice_number
+                    invoice.amount = project.price
+                    invoice.description = f'Payment for {project.title}'
+                    invoice.status = 'paid'
+                    invoice.save()
+
+                    if not invoice.pdf_file:
+                        pdf = generate_invoice_pdf(invoice)
+
+                        invoice.pdf_file.save(
+                            f'{invoice.invoice_number}.pdf',
+                            ContentFile(pdf),
+                            save=True
+                        )
 
         except Exception:
             session = None
 
     return render(request, 'home/payment_success.html', {'session': session})
+
+
+@login_required
+def download_invoice(request, project_id):
+    project = get_object_or_404(
+        ClientProject,
+        id=project_id
+    )
+
+    if not request.user.is_staff and project.client != request.user:
+        return redirect('dashboard')
+
+    invoice, created = Invoice.objects.get_or_create(
+        project=project,
+        defaults={
+            'client': project.client,
+            'invoice_number': project.invoice_number or f'INV-{project.id}',
+            'amount': project.price,
+            'description': f'Payment for {project.title}',
+            'status': 'paid' if project.is_paid else 'unpaid',
+        }
+    )
+
+    if not project.invoice_number:
+        project.invoice_number = invoice.invoice_number
+        project.save()
+
+    invoice.client = project.client
+    invoice.amount = project.price
+    invoice.description = f'Payment for {project.title}'
+
+    if project.is_paid:
+        invoice.status = 'paid'
+    else:
+        invoice.status = 'unpaid'
+
+    invoice.save()
+
+    if not invoice.pdf_file:
+        pdf = generate_invoice_pdf(invoice)
+
+        invoice.pdf_file.save(
+            f'{invoice.invoice_number}.pdf',
+            ContentFile(pdf),
+            save=True
+        )
+
+    response = HttpResponse(
+        invoice.pdf_file.read(),
+        content_type='application/pdf'
+    )
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="{invoice.invoice_number}.pdf"'
+    )
+
+    return response
 
 
 def payment_cancel(request):
@@ -590,6 +679,7 @@ def client_delete_project(request, project_id):
         'project': project,
     })
 
+
 @login_required
 def client_project_messages(request, project_id):
     if request.user.is_staff:
@@ -668,6 +758,7 @@ def admin_project_messages(request, project_id):
         'project': project,
         'project_messages': project_messages,
     })
+
 
 @login_required
 def client_edit_message(request, message_id):

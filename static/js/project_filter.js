@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+
     const searchInput = document.getElementById('project-search');
     const projectRows = document.querySelectorAll('.project-row');
 
@@ -7,9 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     searchInput.addEventListener('input', function () {
+
         const searchText = searchInput.value.toLowerCase();
 
         projectRows.forEach(function (row) {
+
             const rowText = row.textContent.toLowerCase();
 
             if (rowText.includes(searchText)) {
@@ -17,6 +20,9 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 row.style.display = 'none';
             }
+
         });
+
     });
+
 });
