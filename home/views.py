@@ -29,6 +29,33 @@ def request_quote(request):
     submitted = False
 
     if request.method == "POST":
+        full_name = request.POST.get("full_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        phone_number = request.POST.get("phone_number", "").strip()
+        service = request.POST.get("service", "").strip()
+        project_details = request.POST.get("project_details", "").strip()
+
+        if not full_name or not email or not service or not project_details:
+            messages.error(request, "Please complete all required fields.")
+            return redirect("request_quote")
+
+        email_subject = f"Artificium Quote Request: {service}"
+        email_message = (
+            f"Full Name: {full_name}\n"
+            f"Email: {email}\n"
+            f"Phone Number: {phone_number}\n"
+            f"Service: {service}\n\n"
+            f"Project Details:\n{project_details}"
+        )
+
+        send_mail(
+            subject=email_subject,
+            message=email_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.CONTACT_EMAIL],
+            fail_silently=False,
+        )
+
         submitted = True
 
     return render(request, "home/request_quote.html", {"submitted": submitted})

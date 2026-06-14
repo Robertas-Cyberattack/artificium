@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block extra_title %} | Edit Message{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-light">
+    <div class="container py-lg-4">
+
+        <div class="bg-white border shadow-sm p-4">
+
+            <h1 class="h4 mb-4">
+                Edit Message
+            </h1>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="font-weight-bold">
+                        Message
+                    </label>
+
+                    <textarea name="message" class="form-control" rows="5" required>{{ message_obj.message }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark">
+                    Save Changes
+                </button>
+
+                <a href="{% url 'client_project_messages' message_obj.project.id %}" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

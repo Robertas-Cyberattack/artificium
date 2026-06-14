@@ -6,12 +6,13 @@
 - [Project Goals](#project-goals)
 - [User Stories](#user-stories)
 - [Database Design](#database-design)
-- [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Entity Relationship Diagra](#entity-relationship-diagram)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
 - [Automated Testing](#automated-testing)
+- [Project Structure Audit](#project-structure-audit)
 - [Deployment](#deployment)
 - [Stripe Integration](#stripe-integration)
 - [Security](#security)
@@ -526,6 +527,21 @@ The application was tested using:
 Automated testing was implemented using Django's built-in testing framework.
 
 The following tests were created:
+
+### Project Structure Audit
+
+A project structure audit was completed during development.
+
+The application was refactored into multiple Django apps to comply with project requirements:
+
+- home
+- projects
+- payments
+
+Unused duplicate templates were identified and removed.
+Models were separated into reusable apps.
+Imports were updated across the project.
+The application was tested after refactoring to ensure all functionality remained operational.
 
 ### Dashboard Tests
 
