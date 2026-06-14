@@ -21,6 +21,12 @@
             </p>
         </div>
 
+        <div class="mb-4">
+            <a href="{% url 'admin_project_detail' project.id %}" class="btn btn-outline-secondary">
+                Back to Project
+            </a>
+        </div>
+
         <div class="bg-white border shadow-sm p-4 mb-4">
 
             <h2 class="h5 mb-4">
@@ -29,62 +35,73 @@
 
             {% for message in project_messages %}
 
-                <div class="border rounded p-3 mb-3 {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
+            <div class="border rounded p-3 mb-3 {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
 
-                    <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex justify-content-between align-items-start">
 
-                        <div>
-                            <strong>
-                                {% if message.is_admin_message %}
-                                    Admin
-                                {% else %}
-                                    {{ message.sender.username }}
-                                {% endif %}
-                            </strong>
-
-                            {% if not message.is_admin_message and not message.is_read_by_admin %}
-                                <span class="badge badge-danger ml-2">
-                                    New Client Message
-                                </span>
+                    <div>
+                        <strong>
+                            {% if message.is_admin_message %}
+                            Admin
+                            {% else %}
+                            {{ message.sender.username }}
                             {% endif %}
+                        </strong>
 
-                            {% if message.is_admin_message and not message.is_read_by_client %}
-                                <span class="badge badge-warning ml-2">
-                                    Not seen by client
-                                </span>
-                            {% endif %}
-                        </div>
+                        {% if not message.is_admin_message %}
+                        {% if message.is_read_by_admin %}
+                        <span class="badge badge-success ml-2">
+                            Seen by admin
+                        </span>
+                        {% else %}
+                        <span class="badge badge-danger ml-2">
+                            New Client Message
+                        </span>
+                        {% endif %}
+                        {% endif %}
 
-                        <small class="text-muted">
-                            {{ message.created_at|date:"d M Y H:i" }}
-                        </small>
-
+                        {% if message.is_admin_message %}
+                        {% if message.is_read_by_client %}
+                        <span class="badge badge-success ml-2">
+                            Seen by client
+                        </span>
+                        {% else %}
+                        <span class="badge badge-warning ml-2">
+                            Not seen by client
+                        </span>
+                        {% endif %}
+                        {% endif %}
                     </div>
 
-                    <p class="mb-2 mt-2">
-                        {{ message.message }}
-                    </p>
-
-                    <div class="small">
-                        <a href="{% url 'admin_edit_message' message.id %}">
-                            Edit
-                        </a>
-
-                        <span class="text-muted mx-1">|</span>
-
-                        <a href="{% url 'admin_delete_message' message.id %}"
-                           class="text-danger">
-                            Delete
-                        </a>
-                    </div>
+                    <small class="text-muted">
+                        {{ message.created_at|date:"d M Y H:i" }}
+                    </small>
 
                 </div>
 
+                <p class="mb-2 mt-2">
+                    {{ message.message }}
+                </p>
+
+                <div class="small">
+                    <a href="{% url 'admin_edit_message' message.id %}">
+                        Edit
+                    </a>
+
+                    <span class="text-muted mx-1">|</span>
+
+                    <a href="{% url 'admin_delete_message' message.id %}" class="text-danger">
+                        Delete
+                    </a>
+                </div>
+
+            </div>
+
             {% empty %}
 
-                <p class="text-muted mb-0">
-                    No messages yet.
-                </p>
+            <p class="text-muted mb-0">
+                No messages yet.
+            </p>
 
             {% endfor %}
 
@@ -104,26 +121,13 @@
                         Message
                     </label>
 
-                    <textarea
-                        name="message"
-                        class="form-control"
-                        rows="4"
-                        placeholder="Write your reply to client..."
-                        required
-                    ></textarea>
+                    <textarea name="message" class="form-control" rows="4" placeholder="Write your reply to client..."
+                        required></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-dark">
                     Send Message
                 </button>
-
-                <a href="{% url 'admin_project_detail' project.id %}" class="btn btn-outline-secondary">
-                    Back to Project
-                </a>
-
-                <a href="{% url 'admin_projects' %}" class="btn btn-outline-secondary">
-                    Back to Projects
-                </a>
             </form>
 
         </div>

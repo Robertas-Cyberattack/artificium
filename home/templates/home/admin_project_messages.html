@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block extra_title %} | Project Messages{% endblock %}
+{% block extra_title %} | Admin Project Messages{% endblock %}
 
 {% block content %}
 
@@ -9,7 +9,7 @@
 
         <div class="mb-5">
             <p class="text-uppercase font-weight-bold text-secondary mb-2">
-                Client Area
+                Admin Area
             </p>
 
             <h1 class="font-weight-bold">
@@ -17,14 +17,8 @@
             </h1>
 
             <p class="lead text-muted mb-0">
-                Full conversation between you and admin for this project.
+                Client: {{ project.client.username }}
             </p>
-        </div>
-
-        <div class="mb-4">
-            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
-                Back to Dashboard
-            </a>
         </div>
 
         <div class="bg-white border shadow-sm p-4 mb-4">
@@ -43,35 +37,21 @@
                         <strong>
                             {% if message.is_admin_message %}
                             Admin
-                            {% elif message.sender == request.user %}
-                            You
                             {% else %}
                             {{ message.sender.username }}
                             {% endif %}
                         </strong>
 
-                        {% if not message.is_admin_message %}
-                        {% if message.is_read_by_admin %}
-                        <span class="badge badge-success ml-2">
-                            Seen by admin
+                        {% if not message.is_admin_message and not message.is_read_by_admin %}
+                        <span class="badge badge-danger ml-2">
+                            New Client Message
                         </span>
-                        {% else %}
-                        <span class="badge badge-warning ml-2">
-                            Not seen by admin
-                        </span>
-                        {% endif %}
                         {% endif %}
 
-                        {% if message.is_admin_message %}
-                        {% if message.is_read_by_client %}
-                        <span class="badge badge-success ml-2">
-                            Seen
+                        {% if message.is_admin_message and not message.is_read_by_client %}
+                        <span class="badge badge-warning ml-2">
+                            Not seen by client
                         </span>
-                        {% else %}
-                        <span class="badge badge-danger ml-2">
-                            New
-                        </span>
-                        {% endif %}
                         {% endif %}
                     </div>
 
@@ -85,15 +65,15 @@
                     {{ message.message }}
                 </p>
 
-                {% if not message.is_admin_message and message.sender == request.user %}
+                {% if message.is_admin_message and not message.is_read_by_client %}
                 <div class="small">
-                    <a href="{% url 'client_edit_message' message.id %}">
+                    <a href="{% url 'admin_edit_message' message.id %}">
                         Edit
                     </a>
 
                     <span class="text-muted mx-1">|</span>
 
-                    <a href="{% url 'client_delete_message' message.id %}" class="text-danger">
+                    <a href="{% url 'admin_delete_message' message.id %}" class="text-danger">
                         Delete
                     </a>
                 </div>
@@ -104,7 +84,7 @@
             {% empty %}
 
             <p class="text-muted mb-0">
-                No messages yet. Send a message to admin below.
+                No messages yet.
             </p>
 
             {% endfor %}
@@ -114,7 +94,7 @@
         <div class="bg-white border shadow-sm p-4">
 
             <h2 class="h5 mb-3">
-                Send New Message
+                Reply to Client
             </h2>
 
             <form method="post">
@@ -125,13 +105,17 @@
                         Message
                     </label>
 
-                    <textarea name="message" class="form-control" rows="4" placeholder="Write your message to admin..."
+                    <textarea name="message" class="form-control" rows="4" placeholder="Write your reply to client..."
                         required></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-dark">
                     Send Message
                 </button>
+
+                <a href="{% url 'admin_project_detail' project.id %}" class="btn btn-outline-secondary">
+                    Back to Project
+                </a>
             </form>
 
         </div>
