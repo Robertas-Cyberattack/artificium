@@ -1,14 +1,26 @@
+# Environment variables
 .env
-db.sqlite3
-__pycache__/
-*.pyc
-.DS_Store
+env.py
+
+# Virtual environments
+.venv/
+.venv310/
 venv/
 env/
-.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Database
+*.sqlite3
+
+# IDEs
 .vscode/
-env.py
-.venv
-.venv310
-*sqlite3
-__pycache__
+.idea/
+
+# OS files
+.DS_Store
+
+# User uploads
+media/
