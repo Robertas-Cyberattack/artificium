@@ -61,61 +61,175 @@
         <div class="bg-white border shadow-sm p-4 mb-4">
 
             <h2 class="h4 mb-4">
+                Recent Messages
+            </h2>
+
+            {% if messages %}
+
+            {% for message in messages %}
+
+            <div class="border rounded p-3 mb-3">
+
+                <div class="d-flex justify-content-between align-items-start">
+
+                    <div>
+                        <strong>
+                            {% if message.is_admin_message %}
+                            Admin
+                            {% else %}
+                            {{ message.sender.username }}
+                            {% endif %}
+                        </strong>
+
+                        <span class="text-muted">
+                            on {{ message.project.title }}
+                        </span>
+
+                        {% if not message.is_admin_message and not message.is_read_by_admin %}
+                        <span class="badge badge-danger ml-2">
+                            New client message
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <small class="text-muted">
+                        {{ message.created_at|date:"d M Y H:i" }}
+                    </small>
+
+                </div>
+
+                <p class="mb-2 mt-2">
+                    {{ message.message }}
+                </p>
+
+                <a href="{% url 'admin_project_messages' message.project.id %}"
+                    class="btn btn-sm btn-outline-secondary">
+                    Open Conversation
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <p class="text-muted mb-0">
+                No messages yet.
+            </p>
+
+            {% endif %}
+
+        </div>
+        <div class="bg-white border shadow-sm p-4 mb-4">
+
+            <h2 class="h4 mb-4">
+                Uploaded Files
+            </h2>
+
+            {% if files %}
+
+            <div class="table-responsive">
+                <table class="table table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>File</th>
+                            <th>Uploaded By</th>
+                            <th>Uploaded At</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for file in files %}
+                        <tr>
+                            <td>{{ file.project.title }}</td>
+
+                            <td>
+                                <a href="{{ file.file.url }}" target="_blank">
+                                    {{ file.title }}
+                                </a>
+                            </td>
+
+                            <td>{{ file.uploaded_by.username }}</td>
+
+                            <td>{{ file.uploaded_at|date:"d M Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+            {% else %}
+
+            <p class="text-muted mb-0">
+                No files uploaded yet.
+            </p>
+
+            {% endif %}
+
+        </div>
+        <div class="bg-white border shadow-sm p-4 mb-4">
+
+            <h2 class="h4 mb-4">
                 Projects
             </h2>
 
             {% if projects %}
 
-                <div class="table-responsive">
+            <div class="table-responsive">
 
-                    <table class="table table-bordered">
+                <table class="table table-bordered">
 
-                        <thead>
-                            <tr>
-                                <th>Project</th>
-                                <th>Client</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Client</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
+                    <tbody>
 
-                            {% for project in projects %}
+                        {% for project in projects %}
 
-                                <tr>
+                        <tr>
 
-                                    <td>
-                                        {{ project.title }}
-                                    </td>
+                            <td>
+                                <a href="{% url 'admin_project_detail' project.id %}">
+                                    {{ project.title }}
+                                </a>
+                            </td>
 
-                                    <td>
-                                        {{ project.client.username }}
-                                    </td>
+                            <td>
+                                {{ project.client.username }}
+                            </td>
 
-                                    <td>
-                                        {{ project.get_status_display }}
-                                    </td>
+                            <td>
+                                {{ project.get_status_display }}
+                            </td>
 
-                                    <td>
-                                        {{ project.created_at|date:"d M Y" }}
-                                    </td>
+                            <td>
+                                {{ project.created_at|date:"d M Y" }}
+                            </td>
 
-                                </tr>
+                        </tr>
 
-                            {% endfor %}
+                        {% endfor %}
 
-                        </tbody>
+                    </tbody>
 
-                    </table>
+                </table>
 
-                </div>
+            </div>
 
             {% else %}
 
-                <p class="text-muted mb-0">
-                    No projects created yet.
-                </p>
+            <p class="text-muted mb-0">
+                No projects created yet.
+            </p>
 
             {% endif %}
 
@@ -129,51 +243,51 @@
 
             {% if clients %}
 
-                <div class="table-responsive">
+            <div class="table-responsive">
 
-                    <table class="table table-bordered">
+                <table class="table table-bordered">
 
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Date Joined</th>
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Date Joined</th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
+                    <tbody>
 
-                            {% for client in clients %}
+                        {% for client in clients %}
 
-                                <tr>
+                        <tr>
 
-                                    <td>
-                                        {{ client.username }}
-                                    </td>
+                            <td>
+                                {{ client.username }}
+                            </td>
 
-                                    <td>
-                                        {{ client.email }}
-                                    </td>
+                            <td>
+                                {{ client.email }}
+                            </td>
 
-                                    <td>
-                                        {{ client.date_joined|date:"d M Y" }}
-                                    </td>
+                            <td>
+                                {{ client.date_joined|date:"d M Y" }}
+                            </td>
 
-                                </tr>
+                        </tr>
 
-                            {% endfor %}
+                        {% endfor %}
 
-                        </tbody>
+                    </tbody>
 
-                    </table>
+                </table>
 
-                </div>
+            </div>
 
             {% else %}
 
-                <p class="text-muted mb-0">
-                    No clients registered yet.
-                </p>
+            <p class="text-muted mb-0">
+                No clients registered yet.
+            </p>
 
             {% endif %}
 

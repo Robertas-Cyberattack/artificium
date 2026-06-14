@@ -59,10 +59,8 @@
                     Search Projects
                 </label>
 
-                <input type="text"
-                       id="project-search"
-                       class="form-control"
-                       placeholder="Search projects, status, invoice, files or messages...">
+                <input type="text" id="project-search" class="form-control"
+                    placeholder="Search projects, status, invoice, files or messages...">
             </div>
         </div>
 
@@ -74,316 +72,305 @@
 
             {% if projects %}
 
-                <div class="table-responsive">
+            <div class="table-responsive">
 
-                    <table class="table table-bordered mb-0">
+                <table class="table table-bordered mb-0">
 
-                        <thead>
-                            <tr>
-                                <th>Project</th>
-                                <th>Status</th>
-                                <th>Progress</th>
-                                <th>Price</th>
-                                <th>Invoice</th>
-                                <th>Payment</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th>Price</th>
+                            <th>Invoice</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
+                    <tbody>
 
-                            {% for project in projects %}
+                        {% for project in projects %}
 
-                                <tr class="project-row">
+                        <tr class="project-row">
 
-                                    <td style="min-width: 360px;">
-                                        <strong>{{ project.title }}</strong>
+                            <td style="min-width: 360px;">
+                                <strong>{{ project.title }}</strong>
 
-                                        {% if project.messages.count %}
-                                            <div class="small text-muted mt-1">
-                                                <i class="fas fa-envelope"></i>
-                                                {{ project.messages.count }} message{% if project.messages.count != 1 %}s{% endif %}
+                                {% if project.messages.count %}
+                                <div class="small text-muted mt-1">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ project.messages.count }} message{% if project.messages.count != 1 %}s{% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% for message in project.messages.all %}
+                                {% if message.is_admin_message and not message.is_read_by_client %}
+                                <span class="badge badge-danger mt-2">
+                                    New admin message
+                                </span>
+                                {% endif %}
+                                {% endfor %}
+
+                                <div class="mt-3 border-top pt-2">
+
+                                    <strong class="small">
+                                        Project Files:
+                                    </strong>
+
+                                    {% if project.files.all %}
+
+                                    <ul class="list-group mt-2 mb-3">
+
+                                        {% for file in project.files.all %}
+
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center small">
+
+                                            <div>
+                                                <i class="fas fa-paperclip"></i>
+
+                                                <a href="{{ file.file.url }}" target="_blank" rel="noopener">
+                                                    {{ file.title }}
+                                                </a>
+
+                                                <div class="text-muted">
+                                                    Uploaded:
+                                                    {{ file.uploaded_at|date:"d M Y H:i" }}
+                                                </div>
                                             </div>
-                                        {% endif %}
 
-                                        {% for message in project.messages.all %}
-                                            {% if message.is_admin_message and not message.is_read_by_client %}
-                                                <span class="badge badge-danger mt-2">
-                                                    New admin message
-                                                </span>
-                                            {% endif %}
-                                        {% endfor %}
-
-                                        <div class="mt-3 border-top pt-2">
-
-                                            <strong class="small">
-                                                Project Files:
-                                            </strong>
-
-                                            {% if project.files.all %}
-
-                                                <ul class="list-group mt-2 mb-3">
-
-                                                    {% for file in project.files.all %}
-
-                                                        <li class="list-group-item d-flex justify-content-between align-items-center small">
-
-                                                            <div>
-                                                                <i class="fas fa-paperclip"></i>
-
-                                                                <a href="{{ file.file.url }}"
-                                                                   target="_blank"
-                                                                   rel="noopener">
-                                                                    {{ file.title }}
-                                                                </a>
-
-                                                                <div class="text-muted">
-                                                                    Uploaded:
-                                                                    {{ file.uploaded_at|date:"d M Y H:i" }}
-                                                                </div>
-                                                            </div>
-
-                                                            <form method="post"
-                                                                  action="{% url 'delete_project_file' file.id %}">
-                                                                {% csrf_token %}
-
-                                                                <button type="submit"
-                                                                        class="btn btn-sm btn-outline-danger">
-                                                                    Delete
-                                                                </button>
-                                                            </form>
-
-                                                        </li>
-
-                                                    {% endfor %}
-
-                                                </ul>
-
-                                            {% else %}
-
-                                                <p class="small text-muted mb-2 mt-2">
-                                                    No files uploaded yet.
-                                                </p>
-
-                                            {% endif %}
-
-                                            <form method="post"
-                                                  enctype="multipart/form-data"
-                                                  action="{% url 'upload_project_file' project.id %}"
-                                                  class="mb-3">
+                                            <form method="post" action="{% url 'delete_project_file' file.id %}">
                                                 {% csrf_token %}
 
-                                                <input type="text"
-                                                       name="title"
-                                                       class="form-control form-control-sm mb-2"
-                                                       placeholder="File title">
-
-                                                <input type="file"
-                                                       name="file"
-                                                       class="form-control form-control-sm mb-2"
-                                                       required>
-
-                                                <button type="submit"
-                                                        class="btn btn-sm btn-dark">
-                                                    Upload File
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Delete
                                                 </button>
                                             </form>
 
-                                        </div>
+                                        </li>
 
-                                        <div class="mt-3 border-top pt-2">
+                                        {% endfor %}
 
-                                            <strong class="small">
-                                                Conversation:
+                                    </ul>
+
+                                    {% else %}
+
+                                    <p class="small text-muted mb-2 mt-2">
+                                        No files uploaded yet.
+                                    </p>
+
+                                    {% endif %}
+
+                                    <form method="post" enctype="multipart/form-data"
+                                        action="{% url 'upload_project_file' project.id %}" class="mb-3">
+                                        {% csrf_token %}
+
+                                        <input type="text" name="title" class="form-control form-control-sm mb-2"
+                                            placeholder="File title">
+
+                                        <input type="file" name="file" class="form-control form-control-sm mb-2"
+                                            required>
+
+                                        <button type="submit" class="btn btn-sm btn-dark">
+                                            Upload File
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                                <div class="mt-3 border-top pt-2">
+
+                                    <strong class="small">
+                                        Conversation:
+                                    </strong>
+
+                                    {% if project.messages.count %}
+
+                                    {% for message in project.messages.all %}
+
+                                    <div
+                                        class="small mt-2 p-2 border rounded {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
+
+                                        <div class="d-flex justify-content-between">
+                                            <strong>
+                                                {% if message.is_admin_message %}
+                                                Admin
+                                                {% elif message.sender == request.user %}
+                                                You
+                                                {% else %}
+                                                {{ message.sender.username }}
+                                                {% endif %}
                                             </strong>
 
-                                            {% if project.messages.count %}
-
-                                                {% for message in project.messages.all %}
-
-                                                    <div class="small mt-2 p-2 border rounded {% if message.is_admin_message %}bg-light{% else %}bg-white{% endif %}">
-
-                                                        <div class="d-flex justify-content-between">
-                                                            <strong>
-                                                                {% if message.is_admin_message %}
-                                                                    Admin
-                                                                {% else %}
-                                                                    You
-                                                                {% endif %}
-                                                            </strong>
-
-                                                            <span class="text-muted">
-                                                                {{ message.created_at|date:"d M Y H:i" }}
-                                                            </span>
-                                                        </div>
-
-                                                        <div class="mt-1">
-                                                            {{ message.message }}
-                                                        </div>
-
-                                                        {% if not message.is_admin_message %}
-
-                                                            <div class="mt-1">
-                                                                {% if message.is_read_by_admin %}
-                                                                    <span class="badge badge-success">
-                                                                        Seen by admin
-                                                                    </span>
-                                                                {% else %}
-                                                                    <span class="badge badge-warning">
-                                                                        Not seen by admin
-                                                                    </span>
-                                                                {% endif %}
-                                                            </div>
-
-                                                        {% endif %}
-
-                                                        {% if not message.is_admin_message and not message.is_read_by_admin %}
-                                                            <div class="mt-1">
-                                                                <a href="{% url 'client_edit_message' message.id %}" class="small">
-                                                                    Edit
-                                                                </a>
-
-                                                                <span class="text-muted mx-1">|</span>
-
-                                                                <a href="{% url 'client_delete_message' message.id %}" class="small text-danger">
-                                                                    Delete
-                                                                </a>
-                                                            </div>
-                                                        {% endif %}
-
-                                                    </div>
-
-                                                {% endfor %}
-
-                                            {% else %}
-
-                                                <p class="small text-muted mb-0 mt-2">
-                                                    No messages yet.
-                                                </p>
-
-                                            {% endif %}
-
+                                            <span class="text-muted">
+                                                {{ message.created_at|date:"d M Y H:i" }}
+                                            </span>
                                         </div>
 
-                                        <form method="post"
-                                              action="{% url 'client_project_messages' project.id %}"
-                                              class="mt-3">
-                                            {% csrf_token %}
+                                        <div class="mt-1">
+                                            {{ message.message }}
+                                        </div>
 
-                                            <textarea name="message"
-                                                      class="form-control mb-2"
-                                                      rows="2"
-                                                      placeholder="Write message to admin..."
-                                                      required></textarea>
+                                        {% if not message.is_admin_message %}
 
-                                            <button type="submit" class="btn btn-sm btn-outline-dark">
-                                                Send Message
-                                            </button>
-                                        </form>
-                                    </td>
-
-                                    <td>
-                                        {{ project.get_status_display }}
-                                    </td>
-
-                                    <td>
-                                        {{ project.progress }}%
-                                    </td>
-
-                                    <td>
-                                        {% if project.price %}
-                                            £{{ project.price }}
-                                        {% else %}
-                                            Waiting for quote
-                                        {% endif %}
-                                    </td>
-
-                                    <td>
-                                        {% if project.invoice_number %}
-                                            {{ project.invoice_number }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-
-                                    <td>
-                                        {% if project.is_paid %}
-
-                                            <span class="badge badge-success d-block mb-2">
-                                                Paid
+                                        <div class="mt-1">
+                                            {% if message.is_read_by_admin %}
+                                            <span class="badge badge-success">
+                                                Seen by admin
                                             </span>
-
-                                            <a href="{% url 'download_invoice' project.id %}"
-                                               class="btn btn-sm btn-outline-dark">
-                                                <i class="fas fa-file-pdf"></i>
-                                                Download Invoice
-                                            </a>
-
-                                        {% elif project.price > 0 %}
-
-                                            <a href="{% url 'create_project_payment' project.id %}"
-                                               class="btn btn-sm btn-dark mb-1">
-                                                Pay Now
-                                            </a>
-
-                                        {% else %}
-
-                                            <span class="text-muted">
-                                                Not available
+                                            {% else %}
+                                            <span class="badge badge-warning">
+                                                Not seen by admin
                                             </span>
-
-                                        {% endif %}
-                                    </td>
-
-                                    <td>
-                                        <a href="{% url 'client_project_messages' project.id %}"
-                                           class="btn btn-sm btn-outline-secondary mb-1">
-                                            <i class="fas fa-envelope"></i>
-                                            Open Messages
-
-                                            {% if project.messages.count %}
-                                                <span class="badge badge-dark">
-                                                    {{ project.messages.count }}
-                                                </span>
                                             {% endif %}
-                                        </a>
-
-                                        {% if project.status == 'requested' and not project.is_paid %}
-
-                                            <a href="{% url 'client_edit_project' project.id %}"
-                                               class="btn btn-sm btn-outline-dark mb-1">
-                                                Edit Project
-                                            </a>
-
-                                            <a href="{% url 'client_delete_project' project.id %}"
-                                               class="btn btn-sm btn-outline-danger mb-1">
-                                                Delete Project
-                                            </a>
-
-                                        {% else %}
-
-                                            <span class="text-muted d-block">
-                                                Project Locked
-                                            </span>
+                                        </div>
 
                                         {% endif %}
-                                    </td>
 
-                                </tr>
+                                        {% if not message.is_admin_message and not message.is_read_by_admin %}
+                                        <div class="mt-1">
+                                            <a href="{% url 'client_edit_message' message.id %}" class="small">
+                                                Edit
+                                            </a>
 
-                            {% endfor %}
+                                            <span class="text-muted mx-1">|</span>
 
-                        </tbody>
+                                            <a href="{% url 'client_delete_message' message.id %}"
+                                                class="small text-danger">
+                                                Delete
+                                            </a>
+                                        </div>
+                                        {% endif %}
 
-                    </table>
+                                    </div>
 
-                </div>
+                                    {% endfor %}
+
+                                    {% else %}
+
+                                    <p class="small text-muted mb-0 mt-2">
+                                        No messages yet.
+                                    </p>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <form method="post" action="{% url 'client_project_messages' project.id %}"
+                                    class="mt-3">
+                                    {% csrf_token %}
+
+                                    <textarea name="message" class="form-control mb-2" rows="2"
+                                        placeholder="Write message to admin..." required></textarea>
+
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">
+                                        Send Message
+                                    </button>
+                                </form>
+                            </td>
+
+                            <td>
+                                {{ project.get_status_display }}
+                            </td>
+
+                            <td>
+                                {{ project.progress }}%
+                            </td>
+
+                            <td>
+                                {% if project.price %}
+                                £{{ project.price }}
+                                {% else %}
+                                Waiting for quote
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if project.invoice_number %}
+                                {{ project.invoice_number }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if project.is_paid %}
+
+                                <span class="badge badge-success d-block mb-2">
+                                    Paid
+                                </span>
+
+                                <a href="{% url 'download_invoice' project.id %}" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-file-pdf"></i>
+                                    Download Invoice
+                                </a>
+
+                                {% elif project.price > 0 %}
+
+                                <a href="{% url 'create_project_payment' project.id %}"
+                                    class="btn btn-sm btn-dark mb-1">
+                                    Pay Now
+                                </a>
+
+                                {% else %}
+
+                                <span class="text-muted">
+                                    Not available
+                                </span>
+
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <a href="{% url 'client_project_messages' project.id %}"
+                                    class="btn btn-sm btn-outline-secondary mb-1">
+                                    <i class="fas fa-envelope"></i>
+                                    Open Messages
+
+                                    {% if project.messages.count %}
+                                    <span class="badge badge-dark">
+                                        {{ project.messages.count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+
+                                {% if project.status == 'requested' and not project.is_paid %}
+
+                                <a href="{% url 'client_edit_project' project.id %}"
+                                    class="btn btn-sm btn-outline-dark mb-1">
+                                    Edit Project
+                                </a>
+
+                                <a href="{% url 'client_delete_project' project.id %}"
+                                    class="btn btn-sm btn-outline-danger mb-1">
+                                    Delete Project
+                                </a>
+
+                                {% else %}
+
+                                <span class="text-muted d-block">
+                                    Project Locked
+                                </span>
+
+                                {% endif %}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
             {% else %}
 
-                <p class="text-muted mb-0">
-                    No projects yet. Click “New Project” to create your first project request.
-                </p>
+            <p class="text-muted mb-0">
+                No projects yet. Click “New Project” to create your first project request.
+            </p>
 
             {% endif %}
 

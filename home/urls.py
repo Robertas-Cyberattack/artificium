@@ -48,4 +48,9 @@ urlpatterns = [
 
     path('dashboard/admin/messages/<int:message_id>/edit/', views.admin_edit_message, name='admin_edit_message'),
     path('dashboard/admin/messages/<int:message_id>/delete/', views.admin_delete_message, name='admin_delete_message'),
+
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
+
+    
 ]
