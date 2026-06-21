@@ -6,13 +6,12 @@
 - [Project Goals](#project-goals)
 - [User Stories](#user-stories)
 - [Database Design](#database-design)
-- [Entity Relationship Diagra](#entity-relationship-diagram)
+- [Entity Relationship Diagram](#entity-relationship-diagram)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
 - [Automated Testing](#automated-testing)
-- [Project Structure Audit](#project-structure-audit)
 - [Deployment](#deployment)
 - [Stripe Integration](#stripe-integration)
 - [Security](#security)
@@ -28,40 +27,77 @@ Artificium is a Full Stack Django web application developed for engineering and 
 The platform allows clients to:
 
 - Register and manage accounts.
+  - [Screenshot 1](screenshots/register_an_account.png)
+  - [Screenshot 2](screenshots/client_dashboard.png)
+  - [Screenshot 3](screenshots/admin_dashboard.png)
 
-  Related screenshots:
+<br>
 
-  - [Register for an Artificium account](screenshots/register_for_an_Artificium_account.png)
-  - [Client dashboard](screenshots/client_dashboard.png)
-  - [Admin dashboard](screenshots/admin_dashboard.png)
+- Submit project requests.
+  - [Screenshot](screenshots/request_a_quote.png)
 
+<br>
 
-- Submit project requests
+- Upload project files.
+  - [Screenshot](screenshots/upload_project_file.png)
 
-  Related screenshot:
+<br>
 
-  - [Request a quote](screenshots/request_a_quote.png)
+- Communicate with administrators.
+  - [Screenshot](screenshots/communicate_with_administrators.png)
 
+<br>
 
-- Upload project files
+- Make secure online payments using Stripe.
+  - [Screenshot 1](screenshots/online_payment_1.png)
+  - [Screenshot 2](screenshots/online_payment_stripe.png)
 
-  Related screenshot:
+<br>
 
-  - [Request a quote](screenshots/request_a_quote.png)
-
-- Communicate with administrators
-- Make secure online payments using Stripe
 - Download PDF invoices
+  - [Screenshot](screenshots/download_invoice_button.png)
+  - [Example of PDF invoice](screenshots/pdf%20invoice%20example.png)
+
+<br>
+
 - Track project progress
+  - [Screenshot](screenshots/track_progress.png)
+
+<br>
 
 Administrators can:
 
+<br>
+
 - Manage clients
+  - [Screenshot](screenshots/manage_clients.png)
+
+<br>
+
 - Manage projects
+  - [Screenshot](screenshots/manage_projects.png)
+
+<br>
+
 - Upload and manage project files
+  - [Screenshot](screenshots/upload_manage_files.png)
+
+<br>
+
 - Communicate with clients
+  - [Screenshot](screenshots/communicate_with_client.png)
+
+<br>
+
 - Generate invoices
-- Monitor project status
+  - [Screenshot](screenshots/generate_invoices.png)
+
+<br>
+
+- Update project status
+  - [Screenshot](screenshots/project_status.png)
+
+<br>
 
 The application was developed as Milestone Project 4 for the Level 5 Diploma in Web Application Development.
 
@@ -74,20 +110,71 @@ The purpose of Artificium is to provide a professional engineering project manag
 ### Client Goals
 
 - Create project requests
+  - [Screenshot](screenshots/request_a_quote.png)
+
+  <br>
+
 - Upload project files
+  - [Screenshot](screenshots/upload_project_file.png)
+
+  <br>
+
 - Track project progress
+  - [Screenshot](screenshots/upload_project_file.png)
+
+<br>
+
 - Send and receive messages
+  - [Screenshot](screenshots/communicate_with_administrators.png)
+
+<br>
+
 - Download invoices
+  - [Screenshot](screenshots/download_invoice_button.png)
+  - [Example of PDF invoice](screenshots/pdf_invoice_example.png)
+
+<br>
+
 - Make secure payments
+  - [Screenshot 1](screenshots/online_payment_1.png)
+  - [Screenshot 2](screenshots/online_payment_stripe.png)
+
+<br>
 
 ### Administrator Goals
 
+<br>
+
 - Manage clients
+  - [Screenshot](screenshots/manage_clients.png)
+
+<br>
+
 - Manage projects
+  - [Screenshot](screenshots/manage_projects.png)
+
+<br>
+
 - Update project status
+  - [Screenshot](screenshots/project_status.png)
+
+<br>
+
 - Manage files
+  - [Screenshot](screenshots/upload_project_file.png)
+
+<br>
+
 - Communicate with clients
+  - [Screenshot](screenshots/communicate_with_client.png)
+
+<br>
+
 - Generate invoices
+  - [Screenshot](screenshots/download_invoice_button.png)
+  - [Example of PDF invoice](screenshots/pdf_invoice_example.png)
+
+<br>
 
 ---
 
@@ -126,19 +213,18 @@ The application uses a relational database managed by Django ORM.
 
 The built-in Django User model is used for authentication and account management.
 
-Fields include:
-
-- username
-- email
-- password
-- is_staff
-- is_active
-
+- [Fields include](screenshots/is_active.png):
+  - username
+  - email
+  - password
+  - is_staff
+  - is_active
+    
 ---
 
-### ClientProject
+### Client Project 
 
-Stores project information submitted by clients.
+[Stores project information submitted by clients.](screenshots/client_dashboard.png)
 
 | Field | Description |
 |---------|-------------|
@@ -160,7 +246,7 @@ Stores project information submitted by clients.
 
 ### ProjectMessage
 
-Stores messages between clients and administrators.
+[Stores messages between clients and administrators.](screenshots/client_dashboard.png)
 
 | Field | Description |
 |---------|-------------|
@@ -174,9 +260,9 @@ Stores messages between clients and administrators.
 
 ---
 
-### ProjectFile
+### Project File
 
-Stores uploaded project files.
+[Stores uploaded project files](screenshots/client_dashboard.png)
 
 | Field | Description |
 |---------|-------------|
@@ -191,7 +277,7 @@ Stores uploaded project files.
 
 ### Invoice
 
-Stores generated invoices.
+[Stores generated invoices.](screenshots/pdf invoice example.png)
 
 | Field | Description |
 |---------|-------------|
@@ -219,7 +305,7 @@ User
 │      └── Invoice
 ```
 
-An ER Diagram image is included within the project documentation.
+[An ER Diagram image is included within the project documentation](screenshots/Entity_Relationship_Diagram.png)
 
 ---
 
@@ -227,7 +313,7 @@ An ER Diagram image is included within the project documentation.
 
 ### Authentication
 
-The application uses Django Allauth for secure authentication.
+[The application uses Django Allauth for secure authentication.](screenshots/change_password.png)
 
 Features include:
 
@@ -241,7 +327,7 @@ Features include:
 
 ### Client Dashboard
 
-Clients have access to a dedicated dashboard where they can:
+[Clients have access to a dedicated dashboard where they can:](screenshots/client_dashboard.png)
 
 - Create projects
 - Edit projects
@@ -260,7 +346,7 @@ Clients have access to a dedicated dashboard where they can:
 
 ### Admin Dashboard
 
-Administrators have access to additional functionality:
+[Administrators have access to additional functionality:](screenshots/admin_dashboard.png)
 
 - Manage all clients
 - Manage all projects
@@ -275,11 +361,11 @@ Administrators have access to additional functionality:
 
 ### Project Management
 
-The system provides full CRUD functionality.
+[The system provides full CRUD functionality.](screenshots/manage_projects.png)
 
 #### Create
 
-Clients and administrators can create projects.
+[Clients and administrators can create projects.](screenshots/client_dashboard.png)
 
 #### Read
 
@@ -297,7 +383,7 @@ Projects can be deleted before quotation and payment.
 
 ### Messaging System
 
-The application includes a built-in messaging system.
+[The application includes a built-in messaging system.](screenshots/Communicate_with_administrators.png)
 
 Features:
 
@@ -312,7 +398,7 @@ Features:
 
 ### File Management
 
-Clients can upload project files directly from the dashboard.
+[Clients can upload project files directly from the dashboard](screenshots/manage_projects.png)
 
 Supported functionality:
 
@@ -334,7 +420,7 @@ Examples:
 
 ### Payment System
 
-Stripe Checkout has been integrated.
+[Stripe Checkout has been integrated.](screenshots/online_payment_stripe.png)
 
 Features include:
 
@@ -347,8 +433,7 @@ Features include:
 
 ### Invoice System
 
-Invoices are automatically generated.
-
+[Invoices are automatically generated.](screenshots/download_invoice_button.png)
 Features:
 
 - PDF generation
@@ -361,7 +446,7 @@ Features:
 
 ### Search Functionality
 
-JavaScript search functionality allows users to quickly locate projects.
+[JavaScript search functionality allows users to quickly locate projects.](screenshots/client_dashboard.png)
 
 Users can search by:
 
@@ -371,6 +456,21 @@ Users can search by:
 - Messages
 
 Search results update instantly without refreshing the page.
+
+---
+
+### JavaScript Functionality
+
+[Custom JavaScript was implemented to enhance the user experience throughout the application.](screenshots/online_payment.png)
+
+Features include:
+
+- Real-time project search and filtering
+- Dynamic dashboard interactions
+- Instant search results without page refresh
+- Improved navigation and user interface responsiveness
+
+JavaScript was used to provide a more interactive and efficient user experience while maintaining a responsive interface across different devices.
 
 ---
 
@@ -389,6 +489,7 @@ Search results update instantly without refreshing the page.
 ### Frameworks
 
 - Django 3.2
+- Django Allauth
 
 ---
 
@@ -414,13 +515,13 @@ Search results update instantly without refreshing the page.
 
 ### Payment Processing
 
-- Stripe Checkout
+- [Stripe Checkout](screenshots/online_payment_stripe.png)
 
 ---
 
 ### PDF Generation
 
-- ReportLab
+- [ReportLab](screenshots/pdf_invoice_example.png)
 
 ---
 
@@ -441,25 +542,15 @@ Search results update instantly without refreshing the page.
 
 ## Project Structure
 
-The application was developed using a modular Django architecture.
+[The application was developed using a modular Django architecture and is organised into multiple Django applications.](screenshots/Entity_Relationship_Diagram.png)
 
-The project consists of the following Django applications:
+### Applications
 
-- home
-- projects
-- payments
+- **home** – user interface, dashboards, messaging, file management and general application views.
+- **projects** – project-related models and project data management.
+- **payments** – invoice management and payment-related functionality.
 
-During development, the majority of business logic was consolidated within the `home` application, including:
-
-- Dashboard functionality
-- Project management
-- Messaging system
-- File management
-- Invoice generation
-- Stripe payment integration
-
-The remaining applications were retained to support future modular expansion and maintain a scalable project structure.
-
+Separating functionality into dedicated applications improves maintainability, scalability and code organisation while following Django best practices.
 
 ## Testing
 
@@ -471,29 +562,29 @@ Both manual and automated testing methods were used.
 
 ### Manual Testing
 
-| Feature | Test Performed | Result |
-|----------|----------|----------|
-| Registration | Create new user account | Pass |
-| Login | Login with valid credentials | Pass |
-| Logout | Logout from system | Pass |
-| Dashboard Access | Access dashboard after login | Pass |
-| Create Project | Create new project | Pass |
-| Edit Project | Edit project details | Pass |
-| Delete Project | Delete project | Pass |
-| Create Message | Send project message | Pass |
-| Edit Message | Edit own message | Pass |
-| Delete Message | Delete own message | Pass |
-| Admin Dashboard | Access admin dashboard | Pass |
-| Client Management | Create client | Pass |
-| Client Management | Edit client | Pass |
-| Client Management | Delete client | Pass |
-| File Upload | Upload project file | Pass |
-| File Download | Open uploaded file | Pass |
-| File Delete | Delete uploaded file | Pass |
-| Invoice Download | Generate PDF invoice | Pass |
-| Stripe Checkout | Redirect to Stripe | Pass |
-| Search Function | Search projects | Pass |
-| User Permissions | Prevent unauthorized access | Pass |
+| Feature | Test Performed | Result | Link |
+|----------|----------|----------|----------|
+| Registration | Create new user account | Pass | [Screenshot](screenshots/register_an_account.png) |
+| Login | Login with valid credentials | Pass | [Screenshot](screenshots/login.png) |
+| Logout | Logout from system | Pass | [Screenshot](screenshots/logout.png) |
+| Dashboard Access | Access dashboard after login | Pass | [Screenshot](screenshots/admin_dashboard.png) |
+| Create Project | Create new project | Pass | [Screenshot](screenshots/create_project.png) |
+| Edit Project | Edit project details | Pass | [Screenshot](screenshots/create_project.png) |
+| Delete Project | Delete project | Pass | [Screenshot](screenshots/create_project.png) |
+| Create Message | Send project message | Pass | [Screenshot](screenshots/crud_messages.png) |
+| Edit Message | Edit own message | Pass | [Screenshot](screenshots/crud_messages.png) |
+| Delete Message | Delete own message | Pass | [Screenshot](screenshots/crud_messages.png) |
+| Admin Dashboard | Access admin dashboard | Pass | [Screenshot](screenshots/admin_dashboard.png) |
+| Client Management | Create client | Pass | [Screenshot](screenshots/manage_clients.png) |
+| Client Management | Edit client | Pass | [Screenshot](screenshots/manage_clients.png) |
+| Client Management | Delete client | Pass | [Screenshot](screenshots/manage_clients.png) |
+| File Upload | Upload project file | Pass | [Screenshot](screenshots/crud_file.png) |
+| File Download | Open uploaded file | Pass | [Screenshot](screenshots/crud_file.png) |
+| File Delete | Delete uploaded file | Pass | [Screenshot](screenshots/crud_file.png) |
+| Invoice Download | Generate PDF invoice | Pass | [Screenshot](screenshots/pdf_invoice_example.png) |
+| Stripe Checkout | Redirect to Stripe | Pass | [Screenshot](screenshots/online_payment_stripe.png) |
+| Search Function | Search projects | Pass | [Screenshot](screenshots/client_dashboard.png) |
+| User Permissions | Prevent unauthorized access | Pass | [Screenshot](screenshots/login.png) |
 
 ---
 
@@ -501,12 +592,12 @@ Both manual and automated testing methods were used.
 
 The application was tested on:
 
-| Device | Result |
-|----------|----------|
-| Desktop | Pass |
-| Laptop | Pass |
-| Tablet | Pass |
-| Mobile Phone | Pass |
+| Device | Result | Link |
+|----------|----------|----------|
+| Desktop | Pass | [Screenshot](screenshots/desktop.png) |
+| Laptop | Pass | [Screenshot](screenshots/laptop.png) |
+| Tablet | Pass | [Screenshot](screenshots/tablet.png) |
+| Mobile Phone | Pass | [Screenshot](screenshots/mobile.png) |
 
 ---
 
@@ -514,34 +605,57 @@ The application was tested on:
 
 The application was tested using:
 
-| Browser | Result |
-|----------|----------|
-| Google Chrome | Pass |
-| Microsoft Edge | Pass |
-| Mozilla Firefox | Pass |
+| Browser | Result | Link |
+|----------|----------|----------|
+| Google Chrome | Pass | [Screenshot](screenshots/chrome.png) |
+| Microsoft Edge | Pass | [Screenshot](screenshots/edge.png) |
+| Mozilla Firefox | Pass | [Screenshot](screenshots/firefox.png) |
+
+### Validation Testing
+
+| Test | Tool | Result | Link |
+|----------|----------|----------|----------|
+| Django Configuration | python manage.py check | Pass | [Screenshot](screenshots/python_managepy_check.png) |
+| Python Testing | python manage.py test | Pass | [Screenshot](screenshots/python_managepy_check.png) |
+| HTML Validation | W3C Markup Validator | No significant errors | Page source was validated directly because the application was developed locally on 127.0.0.1. during testing |
+| JavaScript Console Testing | Chrome DevTools | Pass | [Screenshots 1](screenshots/lighthouse_desktop.png) [2](screenshots/lighthouse_mobile.png) [3](screenshots/snapshot_desktop.png) [4](screenshots/timespan-mobile.png) |
+
+### CSS Validation
+
+The application does not use a custom CSS stylesheet.
+
+Styling is primarily provided through Bootstrap 4 and Font Awesome CDN libraries. Visual presentation, responsiveness and layout were tested manually across multiple devices and browsers.
+
+### Permission Testing
+
+| Scenario | Result | Link |
+|----------|----------|----------|
+| Unauthenticated user cannot access dashboard | Pass | [Screenshots](screenshots/unauthenticated_user_cannot_access.png) |
+| Client cannot access admin dashboard | Pass | [Screenshots](screenshots/unauthenticated_user_cannot_access.png) |
+| Client cannot edit another client's project | Pass |
+| Client cannot delete another client's project | Pass |
+| Client cannot access admin functionality | Pass |
+| Administrator can access all projects | Pass |
+
+### Lighthouse Testing
+
+Lighthouse testing was performed using Google Chrome Developer Tools.
+
+| Page | Performance | Accessibility | Best Practices | SEO |
+|----------|----------|----------|----------|----------|
+| Home | XX | XX | XX | XX |
+| Login | XX | XX | XX | XX |
+| Client Dashboard | XX | XX | XX | XX |
+| Admin Dashboard | XX | XX | XX | XX |
 
 ---
 
 ## Automated Testing
 
-Automated testing was implemented using Django's built-in testing framework.
+Automated testing was implemented using Django's built-in testing framework (`django.test.TestCase`).
 
-The following tests were created:
+The following automated tests were created:
 
-### Project Structure Audit
-
-A project structure audit was completed during development.
-
-The application was refactored into multiple Django apps to comply with project requirements:
-
-- home
-- projects
-- payments
-
-Unused duplicate templates were identified and removed.
-Models were separated into reusable apps.
-Imports were updated across the project.
-The application was tested after refactoring to ensure all functionality remained operational.
 
 ### Dashboard Tests
 
