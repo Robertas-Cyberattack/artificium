@@ -618,9 +618,9 @@ The application was tested using:
 | Django Configuration | python manage.py check | Pass | [Screenshot](screenshots/python_managepy_check.png) |
 | Python Testing | python manage.py test | Pass | [Screenshot](screenshots/python_managepy_check.png) |
 | HTML Validation | W3C Markup Validator | No significant errors | Page source was validated directly because the application was developed locally on 127.0.0.1. during testing |
-| JavaScript Console Testing | Chrome DevTools | Pass | [Screenshots 1](screenshots/lighthouse_desktop.png) [2](screenshots/lighthouse_mobile.png) [3](screenshots/snapshot_desktop.png) [4](screenshots/timespan-mobile.png) |
+| JavaScript Console Testing | Chrome DevTools | Pass | [Screenshot](screenshots/chrome_dev_tools_console.png)
 
-### CSS Validation
+### CSS Validation 
 
 The application does not use a custom CSS stylesheet.
 
@@ -632,21 +632,21 @@ Styling is primarily provided through Bootstrap 4 and Font Awesome CDN libraries
 |----------|----------|----------|
 | Unauthenticated user cannot access dashboard | Pass | [Screenshots](screenshots/unauthenticated_user_cannot_access.png) |
 | Client cannot access admin dashboard | Pass | [Screenshots](screenshots/unauthenticated_user_cannot_access.png) |
-| Client cannot edit another client's project | Pass |
-| Client cannot delete another client's project | Pass |
-| Client cannot access admin functionality | Pass |
-| Administrator can access all projects | Pass |
+| Client cannot edit another client's project | Pass | [Screenshots](screenshots/user_can_not.png) |
+| Client cannot delete another client's project | Pass | [Screenshots](screenshots/user_can_not.png) |
+| Client cannot access admin functionality | Pass | [Screenshots](screenshots/user_can_not.png) |
+| Administrator can access all projects | Pass | [Screenshots](screenshots/admin_dashboard.png) |
 
 ### Lighthouse Testing
 
 Lighthouse testing was performed using Google Chrome Developer Tools.
 
-| Page | Performance | Accessibility | Best Practices | SEO |
-|----------|----------|----------|----------|----------|
-| Home | XX | XX | XX | XX |
-| Login | XX | XX | XX | XX |
-| Client Dashboard | XX | XX | XX | XX |
-| Admin Dashboard | XX | XX | XX | XX |
+| Page | Performance | Accessibility | Best Practices | SEO | Link |
+|----------|----------|----------|----------|----------|----------|
+| Home | 100 | 98 | 100 | 90 |[Screenshot](screenshots/lighthouse_desktop.png) |
+| Login | 96 | 95 | 100 | 90 |[Screenshot](screenshots/lighthouse_login.png) |
+| Client Dashboard | 1/1 | 20/23 | 4/4 | 3/4 |[Screenshot](screenshots/snapshot_desktop.png)
+| Admin Dashboard | 100 | 91 | 100 | 90 |[Screenshot](screenshots/lighthouse_admin.png)
 
 ---
 
@@ -714,8 +714,10 @@ Several security measures have been implemented within the application.
 
 - Django Authentication System
 - Django Allauth
-- Secure password hashing
+- Secure password hashing 
 - Session management
+
+  - [Screenshot](screenshots/hash_password.png)
 
 ### Access Control
 
@@ -724,9 +726,11 @@ Several security measures have been implemented within the application.
 - Client project ownership validation
 - Admin-only functionality protection
 
+  - [Screenshot](screenshots/hash_password.png)
+
 ### Payment Security
 
-- Stripe hosted checkout
+- Stripe hosted checkout [Screenshot](screenshots/online_payment_stripe.png) 
 - Secure payment processing
 - Secret keys stored in environment variables
 
